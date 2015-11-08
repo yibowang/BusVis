@@ -1,0 +1,298 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<style type="text/css">@import 'fauxconsole.css';</style> <!-- IE浏览器下使用console.log -->
+	<script type="text/javascript" src="fauxconsole.js"></script> <!-- IE浏览器下使用console.log -->
+
+	<style type="text/css">
+		body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#myMap{height:600px;width:100%;}
+	</style>
+
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=inGwP7mGu57t6fPT0OVmBY35"></script>
+	<script type="text/javascript" src="jquery.js"></script>
+
+
+
+	<title>公交/地铁线路查询</title>
+</head>
+<body>
+	<div id="myMap"></div>
+    速度
+    <input type="text" id="speedRate" style="width:50px;" value="50"/>
+    <!-- <input type="button" value="动画展示" onclick="run(0)">
+    <input type="button" value="暂停" onclick="pause();">
+    <input type="button" value="继续" onclick="conti();"> -->
+    <button id="run" >run</button> 
+    <button id="pause">pause</button> 
+    <button id="continue">continue</button> 
+
+    
+
+</body>
+</html>
+
+<script type="text/javascript">
+
+            var busStr = /*73720*/'[{"busdata":[{"name":"中关村南","x":116.310494479,"y":39.982596094,"time":0.834722222222222,"up":2,"off":0,"rest":2,"date":1446033720000},{"name":"中关村一街","x":116.3156419908,"y":39.9840593864,"time":0.838055555555556,"up":0,"off":0,"rest":2,"date":1446034008000},{"name":"保福寺桥西","x":116.3243090147,"y":39.9843648396,"time":0.841388888888889,"up":0,"off":0,"rest":2,"date":1446034296000},{"name":"清华东路西口","x":116.3284201309,"y":39.9953479736,"time":0.844722222222222,"up":0,"off":0,"rest":2,"date":1446034584000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615709,"time":0.848055555555556,"up":0,"off":0,"rest":2,"date":1446034872000},{"name":"前八家","x":116.3351199075,"y":40.0053500717,"time":0.851388888888889,"up":0,"off":0,"rest":2,"date":1446035160000},{"name":"科荟路西口","x":116.3509860214,"y":40.0066088246,"time":0.853819444444444,"up":0,"off":0,"rest":5,"date":1446035370000},{"name":"科荟桥东","x":116.3625479987,"y":40.0081725061,"time":0.85625,"up":0,"off":0,"rest":5,"date":1446035580000},{"name":"奥运村西","x":116.3693733353,"y":40.0034940958,"time":0.857638888888889,"up":0,"off":0,"rest":6,"date":1446035700000},{"name":"南沟泥河","x":116.3725799969,"y":40.0003721378,"time":0.859027777777778,"up":0,"off":0,"rest":6,"date":1446035820000},{"name":"慧忠北里","x":116.4016872484,"y":40.0026400699,"time":0.862731481481481,"up":0,"off":0,"rest":7,"date":1446036140000},{"name":"科荟路东口","x":116.4087179971,"y":40.007924394,"time":0.866435185185185,"up":0,"off":0,"rest":7,"date":1446036460000},{"name":"北苑","x":116.4119797963,"y":40.0266370711,"time":0.870138888888889,"up":0,"off":0,"rest":7,"date":1446036780000},{"name":"大羊坊","x":116.4101876147,"y":40.0355529263,"time":0.871527777777778,"up":0,"off":0,"rest":5,"date":1446036900000},{"name":"北苑家园西站","x":116.4174740073,"y":40.0400358869,"time":0.872916666666667,"up":0,"off":0,"rest":5,"date":1446037020000},{"name":"北苑家园","x":116.4219748507,"y":40.0400415344,"time":0.87462962962963,"up":0,"off":0,"rest":4,"date":1446037168000},{"name":"北苑家园西站","x":116.4174730136,"y":40.0401265783,"time":0.898425925925926,"up":0,"off":0,"rest":0,"date":1446039224000},{"name":"大羊坊东站","x":116.4147709595,"y":40.0361906711,"time":0.922222222222222,"up":0,"off":0,"rest":0,"date":1446041280000},{"name":"北苑","x":116.4116635323,"y":40.0283040675,"time":0.927083333333333,"up":0,"off":0,"rest":2,"date":1446041700000},{"name":"辛店村","x":116.4105966067,"y":40.0147281212,"time":0.929166666666667,"up":0,"off":0,"rest":3,"date":1446041880000},{"name":"慧忠北里","x":116.4015095232,"y":40.0032370776,"time":0.933333333333333,"up":0,"off":0,"rest":3,"date":1446042240000},{"name":"南沟泥河","x":116.3725930093,"y":40.0004727019,"time":0.9375,"up":0,"off":0,"rest":3,"date":1446042600000},{"name":"奥运村西","x":116.3694810345,"y":40.0035010724,"time":0.938194444444444,"up":0,"off":0,"rest":5,"date":1446042660000},{"name":"林萃路口西","x":116.3683230043,"y":40.0085529805,"time":0.94009837962963,"up":0,"off":0,"rest":6,"date":1446042824500},{"name":"科荟路西口","x":116.3508159446,"y":40.0067064352,"time":0.942002314814815,"up":0,"off":0,"rest":6,"date":1446042989000},{"name":"林大北路东口","x":116.345310001,"y":40.0064330441,"time":0.943055555555556,"up":0,"off":0,"rest":4,"date":1446043080000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615156,"time":0.946045524691358,"up":0,"off":0,"rest":7,"date":1446043338333.3333},{"name":"清华东路西口","x":116.3288281937,"y":39.9956728842,"time":0.94903549382716,"up":0,"off":0,"rest":7,"date":1446043596666.6667},{"name":"东升园","x":116.3267806343,"y":39.98901106,"time":0.952025462962963,"up":0,"off":0,"rest":7,"date":1446043855000},{"name":"中关村南路东口","x":116.323769004,"y":39.9796579906,"time":0.953987268518518,"up":0,"off":0,"rest":2,"date":1446044024500},{"name":"中关村南","x":116.3104941625,"y":39.9826000791,"time":0.955949074074074,"up":0,"off":0,"rest":2,"date":1446044194000},{"name":"中关村一街","x":116.3156419908,"y":39.9840593864,"time":0.95818287037037,"up":0,"off":0,"rest":4,"date":1446044387000},{"name":"保福寺桥西","x":116.3243090147,"y":39.9843648396,"time":0.960416666666667,"up":0,"off":0,"rest":4,"date":1446044580000},{"name":"清华东路西口","x":116.3284201309,"y":39.9953479736,"time":0.963194444444444,"up":0,"off":0,"rest":10,"date":1446044820000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615709,"time":0.965972222222222,"up":0,"off":0,"rest":10,"date":1446045060000},{"name":"前八家","x":116.3351199075,"y":40.0053500717,"time":0.967517361111111,"up":0,"off":0,"rest":8,"date":1446045193500},{"name":"科荟路西口","x":116.3509860214,"y":40.0066088246,"time":0.9690625,"up":0,"off":0,"rest":8,"date":1446045327000},{"name":"科荟桥东","x":116.3625479987,"y":40.0081725061,"time":0.970069444444444,"up":0,"off":0,"rest":7,"date":1446045414000},{"name":"奥运村西","x":116.3693733353,"y":40.0034940958,"time":0.971076388888889,"up":0,"off":0,"rest":7,"date":1446045501000},{"name":"南沟泥河","x":116.3725799969,"y":40.0003721378,"time":0.971296296296296,"up":0,"off":0,"rest":5,"date":1446045520000},{"name":"慧忠北里","x":116.4016872484,"y":40.0026400699,"time":0.974614197530864,"up":0,"off":0,"rest":3,"date":1446045806666.6667},{"name":"科荟路东口","x":116.4087179971,"y":40.007924394,"time":0.977932098765432,"up":0,"off":0,"rest":3,"date":1446046093333.3333},{"name":"北苑","x":116.4119797963,"y":40.0266370711,"time":0.98125,"up":0,"off":0,"rest":3,"date":1446046380000},{"name":"大羊坊","x":116.4101876147,"y":40.0355529263,"time":0.983784722222222,"up":0,"off":0,"rest":3,"date":1446046599000},{"name":"北苑家园西站","x":116.4174740073,"y":40.0400358869,"time":0.983993055555556,"up":0,"off":0,"rest":1,"date":1446046617000},{"name":"北苑家园","x":116.4219748507,"y":40.0400415344,"time":0.984201388888889,"up":0,"off":0,"rest":1,"date":1446046635000}]}'+
+    /*11204*/',{"busdata":[{"name":"保福寺桥西","x":116.3243090147,"y":39.9843648396,"time":0.7125,"up":1,"off":0,"rest":1,"date":1446023160000},{"name":"清华东路西口","x":116.3284201309,"y":39.9953479736,"time":0.715277777777778,"up":0,"off":0,"rest":1,"date":1446023400000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615709,"time":0.719097222222222,"up":0,"off":0,"rest":3,"date":1446023730000},{"name":"前八家","x":116.3351199075,"y":40.0053500717,"time":0.722916666666667,"up":0,"off":0,"rest":3,"date":1446024060000},{"name":"科荟路西口","x":116.3509860214,"y":40.0066088246,"time":0.724768518518519,"up":0,"off":0,"rest":5,"date":1446024220000},{"name":"科荟桥东","x":116.3625479987,"y":40.0081725061,"time":0.72662037037037,"up":0,"off":0,"rest":5,"date":1446024380000},{"name":"奥运村西","x":116.3693733353,"y":40.0034940958,"time":0.728472222222222,"up":0,"off":0,"rest":5,"date":1446024540000},{"name":"南沟泥河","x":116.3725799969,"y":40.0003721378,"time":0.729861111111111,"up":0,"off":0,"rest":6,"date":1446024660000},{"name":"慧忠北里","x":116.4016872484,"y":40.0026400699,"time":0.732638888888889,"up":0,"off":0,"rest":6,"date":1446024900000},{"name":"科荟路东口","x":116.4087179971,"y":40.007924394,"time":0.736805555555555,"up":0,"off":0,"rest":7,"date":1446025260000},{"name":"北苑","x":116.4119797963,"y":40.0266370711,"time":0.740972222222222,"up":0,"off":0,"rest":7,"date":1446025620000},{"name":"大羊坊","x":116.4101876147,"y":40.0355529263,"time":0.745405092592593,"up":0,"off":0,"rest":11,"date":1446026003000},{"name":"北苑家园西站","x":116.4174740073,"y":40.0400358869,"time":0.748611111111111,"up":0,"off":0,"rest":9,"date":1446026280000},{"name":"北苑家园","x":116.4219748507,"y":40.0400415344,"time":0.750104166666667,"up":0,"off":0,"rest":6,"date":1446026409000}]}'+
+    /*11206*/',{"busdata":[{"name":"中关村南","x":116.310494479,"y":39.982596094,"time":0.331944444444444,"up":1,"off":0,"rest":1,"date":1445990280000},{"name":"中关村一街","x":116.3156419908,"y":39.9840593864,"time":0.333333333333333,"up":0,"off":0,"rest":1,"date":1445990400000},{"name":"保福寺桥西","x":116.3243090147,"y":39.9843648396,"time":0.338194444444444,"up":0,"off":0,"rest":3,"date":1445990820000},{"name":"清华东路西口","x":116.3284201309,"y":39.9953479736,"time":0.340972222222222,"up":0,"off":0,"rest":5,"date":1445991060000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615709,"time":0.344444444444444,"up":0,"off":0,"rest":6,"date":1445991360000},{"name":"前八家","x":116.3351199075,"y":40.0053500717,"time":0.347916666666667,"up":0,"off":0,"rest":6,"date":1445991660000},{"name":"科荟路西口","x":116.3509860214,"y":40.0066088246,"time":0.35,"up":0,"off":0,"rest":17,"date":1445991840000},{"name":"科荟桥东","x":116.3625479987,"y":40.0081725061,"time":0.352777777777778,"up":0,"off":0,"rest":29,"date":1445992080000},{"name":"奥运村西","x":116.3693733353,"y":40.0034940958,"time":0.354166666666667,"up":0,"off":0,"rest":32,"date":1445992200000},{"name":"南沟泥河","x":116.3725799969,"y":40.0003721378,"time":0.355555555555556,"up":0,"off":0,"rest":35,"date":1445992320000},{"name":"慧忠北里","x":116.4016872484,"y":40.0026400699,"time":0.360416666666667,"up":0,"off":0,"rest":37,"date":1445992740000},{"name":"科荟路东口","x":116.4087179971,"y":40.007924394,"time":0.364490740740741,"up":0,"off":0,"rest":42,"date":1445993092000},{"name":"北苑","x":116.4119797963,"y":40.0266370711,"time":0.366863425925926,"up":0,"off":0,"rest":32,"date":1445993297000},{"name":"大羊坊","x":116.4101876147,"y":40.0355529263,"time":0.369444444444444,"up":0,"off":0,"rest":16,"date":1445993520000},{"name":"北苑家园西站","x":116.4174740073,"y":40.0400358869,"time":0.37193287037037,"up":0,"off":0,"rest":4,"date":1445993735000},{"name":"北苑家园","x":116.4219748507,"y":40.0400415344,"time":0.373101851851852,"up":0,"off":0,"rest":3,"date":1445993836000},{"name":"北苑家园西站","x":116.4174730136,"y":40.0401265783,"time":0.3875,"up":0,"off":0,"rest":4,"date":1445995080000},{"name":"大羊坊东站","x":116.4147709595,"y":40.0361906711,"time":0.390277777777778,"up":0,"off":0,"rest":12,"date":1445995320000},{"name":"北苑","x":116.4116635323,"y":40.0283040675,"time":0.392361111111111,"up":0,"off":0,"rest":15,"date":1445995500000},{"name":"辛店村","x":116.4105966067,"y":40.0147281212,"time":0.394479166666667,"up":0,"off":0,"rest":16,"date":1445995683000},{"name":"慧忠北里","x":116.4015095232,"y":40.0032370776,"time":0.4,"up":0,"off":0,"rest":22,"date":1445996160000},{"name":"南沟泥河","x":116.3725930093,"y":40.0004727019,"time":0.403472222222222,"up":0,"off":0,"rest":23,"date":1445996460000},{"name":"奥运村西","x":116.3694810345,"y":40.0035010724,"time":0.404861111111111,"up":0,"off":0,"rest":15,"date":1445996580000},{"name":"林萃路口西","x":116.3683230043,"y":40.0085529805,"time":0.40625,"up":0,"off":0,"rest":15,"date":1445996700000},{"name":"科荟路西口","x":116.3508159446,"y":40.0067064352,"time":0.408333333333333,"up":0,"off":0,"rest":15,"date":1445996880000},{"name":"林大北路东口","x":116.345310001,"y":40.0064330441,"time":0.411087962962963,"up":0,"off":0,"rest":15,"date":1445997118000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615156,"time":0.413842592592593,"up":0,"off":0,"rest":12,"date":1445997356000},{"name":"清华东路西口","x":116.3288281937,"y":39.9956728842,"time":0.418356481481481,"up":0,"off":0,"rest":11,"date":1445997746000},{"name":"东升园","x":116.3267806343,"y":39.98901106,"time":0.427777777777778,"up":0,"off":0,"rest":9,"date":1445998560000},{"name":"中关村南路东口","x":116.323769004,"y":39.9796579906,"time":0.4290625,"up":0,"off":0,"rest":11,"date":1445998671000},{"name":"中关村南","x":116.3104941625,"y":39.9826000791,"time":0.434722222222222,"up":0,"off":0,"rest":10,"date":1445999160000},{"name":"中关村一街","x":116.3156419908,"y":39.9840593864,"time":0.436805555555556,"up":0,"off":0,"rest":14,"date":1445999340000},{"name":"保福寺桥西","x":116.3243090147,"y":39.9843648396,"time":0.438888888888889,"up":0,"off":0,"rest":14,"date":1445999520000},{"name":"清华东路西口","x":116.3284201309,"y":39.9953479736,"time":0.440972222222222,"up":0,"off":0,"rest":14,"date":1445999700000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615709,"time":0.444444444444444,"up":0,"off":0,"rest":17,"date":1446000000000},{"name":"前八家","x":116.3351199075,"y":40.0053500717,"time":0.447916666666667,"up":0,"off":0,"rest":17,"date":1446000300000},{"name":"科荟路西口","x":116.3509860214,"y":40.0066088246,"time":0.450347222222222,"up":0,"off":0,"rest":14,"date":1446000510000},{"name":"科荟桥东","x":116.3625479987,"y":40.0081725061,"time":0.452777777777778,"up":0,"off":0,"rest":14,"date":1446000720000},{"name":"奥运村西","x":116.3693733353,"y":40.0034940958,"time":0.454872685185185,"up":0,"off":0,"rest":8,"date":1446000901000},{"name":"南沟泥河","x":116.3725799969,"y":40.0003721378,"time":0.455555555555556,"up":0,"off":0,"rest":7,"date":1446000960000},{"name":"慧忠北里","x":116.4016872484,"y":40.0026400699,"time":0.458298611111111,"up":0,"off":0,"rest":7,"date":1446001197000},{"name":"科荟路东口","x":116.4087179971,"y":40.007924394,"time":0.462013888888889,"up":0,"off":0,"rest":11,"date":1446001518000},{"name":"北苑","x":116.4119797963,"y":40.0266370711,"time":0.464583333333333,"up":0,"off":0,"rest":11,"date":1446001740000},{"name":"大羊坊","x":116.4101876147,"y":40.0355529263,"time":0.466631944444444,"up":0,"off":0,"rest":6,"date":1446001917000},{"name":"北苑家园西站","x":116.4174740073,"y":40.0400358869,"time":0.4675,"up":0,"off":0,"rest":4,"date":1446001992000},{"name":"北苑家园","x":116.4219748507,"y":40.0400415344,"time":0.469398148148148,"up":0,"off":0,"rest":2,"date":1446002156000},{"name":"北苑家园西站","x":116.4174730136,"y":40.0401265783,"time":0.566296296296296,"up":0,"off":0,"rest":4,"date":1446010528000},{"name":"大羊坊东站","x":116.4147709595,"y":40.0361906711,"time":0.663194444444444,"up":0,"off":0,"rest":4,"date":1446018900000},{"name":"北苑","x":116.4116635323,"y":40.0283040675,"time":0.663877314814815,"up":0,"off":0,"rest":4,"date":1446018959000},{"name":"辛店村","x":116.4105966067,"y":40.0147281212,"time":0.666064814814815,"up":0,"off":0,"rest":3,"date":1446019148000},{"name":"慧忠北里","x":116.4015095232,"y":40.0032370776,"time":0.670833333333333,"up":0,"off":0,"rest":2,"date":1446019560000},{"name":"南沟泥河","x":116.3725930093,"y":40.0004727019,"time":0.674305555555556,"up":0,"off":0,"rest":4,"date":1446019860000},{"name":"奥运村西","x":116.3694810345,"y":40.0035010724,"time":0.675694444444444,"up":0,"off":0,"rest":9,"date":1446019980000},{"name":"林萃路口西","x":116.3683230043,"y":40.0085529805,"time":0.677083333333333,"up":0,"off":0,"rest":9,"date":1446020100000},{"name":"科荟路西口","x":116.3508159446,"y":40.0067064352,"time":0.681944444444444,"up":0,"off":0,"rest":10,"date":1446020520000},{"name":"林大北路东口","x":116.345310001,"y":40.0064330441,"time":0.682638888888889,"up":0,"off":0,"rest":6,"date":1446020580000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615156,"time":0.683333333333333,"up":0,"off":0,"rest":7,"date":1446020640000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615156,"time":0.685190972222222,"up":0,"off":0,"rest":9,"date":1446020800500},{"name":"清华东路西口","x":116.3288281937,"y":39.9956728842,"time":0.687048611111111,"up":0,"off":0,"rest":9,"date":1446020961000},{"name":"东升园","x":116.3267806343,"y":39.98901106,"time":0.689791666666667,"up":0,"off":0,"rest":8,"date":1446021198000},{"name":"中关村南路东口","x":116.323769004,"y":39.9796579906,"time":0.693055555555556,"up":0,"off":0,"rest":13,"date":1446021480000},{"name":"中关村南","x":116.3104941625,"y":39.9826000791,"time":0.697222222222222,"up":0,"off":0,"rest":15,"date":1446021840000},{"name":"中关村一街","x":116.3156419908,"y":39.9840593864,"time":0.699652777777778,"up":0,"off":0,"rest":12,"date":1446022050000},{"name":"保福寺桥西","x":116.3243090147,"y":39.9843648396,"time":0.702083333333333,"up":0,"off":0,"rest":12,"date":1446022260000},{"name":"清华东路西口","x":116.3284201309,"y":39.9953479736,"time":0.70625,"up":0,"off":0,"rest":22,"date":1446022620000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615709,"time":0.710416666666667,"up":0,"off":0,"rest":29,"date":1446022980000},{"name":"前八家","x":116.3351199075,"y":40.0053500717,"time":0.713194444444444,"up":0,"off":0,"rest":30,"date":1446023220000},{"name":"科荟路西口","x":116.3509860214,"y":40.0066088246,"time":0.714583333333333,"up":0,"off":0,"rest":34,"date":1446023340000},{"name":"科荟桥东","x":116.3625479987,"y":40.0081725061,"time":0.717361111111111,"up":0,"off":0,"rest":40,"date":1446023580000},{"name":"奥运村西","x":116.3693733353,"y":40.0034940958,"time":0.718125,"up":0,"off":0,"rest":36,"date":1446023646000},{"name":"南沟泥河","x":116.3725799969,"y":40.0003721378,"time":0.720138888888889,"up":0,"off":0,"rest":36,"date":1446023820000},{"name":"慧忠北里","x":116.4016872484,"y":40.0026400699,"time":0.723611111111111,"up":0,"off":0,"rest":36,"date":1446024120000},{"name":"科荟路东口","x":116.4087179971,"y":40.007924394,"time":0.729861111111111,"up":0,"off":0,"rest":19,"date":1446024660000},{"name":"北苑","x":116.4119797963,"y":40.0266370711,"time":0.731944444444444,"up":0,"off":0,"rest":22,"date":1446024840000},{"name":"大羊坊","x":116.4101876147,"y":40.0355529263,"time":0.7375,"up":0,"off":0,"rest":24,"date":1446025320000},{"name":"北苑家园西站","x":116.4174740073,"y":40.0400358869,"time":0.739814814814815,"up":0,"off":0,"rest":24,"date":1446025520000},{"name":"北苑家园","x":116.4219748507,"y":40.0400415344,"time":0.741388888888889,"up":0,"off":0,"rest":11,"date":1446025656000}]}'+
+    /*112019*/',{"busdata":[{"name":"北苑家园","x":116.4221249154,"y":40.0400977983,"time":0.732638888888889,"up":1,"off":0,"rest":1,"date":1446024900000},{"name":"北苑家园西站","x":116.4174730136,"y":40.0401265783,"time":0.734027777777778,"up":0,"off":0,"rest":1,"date":1446025020000},{"name":"大羊坊东站","x":116.4147709595,"y":40.0361906711,"time":0.735648148148148,"up":0,"off":0,"rest":2,"date":1446025160000},{"name":"北苑","x":116.4116635323,"y":40.0283040675,"time":0.739363425925926,"up":0,"off":0,"rest":11,"date":1446025481000},{"name":"辛店村","x":116.4105966067,"y":40.0147281212,"time":0.740185185185185,"up":0,"off":0,"rest":18,"date":1446025552000},{"name":"慧忠北里","x":116.4015095232,"y":40.0032370776,"time":0.747222222222222,"up":0,"off":0,"rest":21,"date":1446026160000},{"name":"南沟泥河","x":116.3725930093,"y":40.0004727019,"time":0.750694444444444,"up":0,"off":0,"rest":28,"date":1446026460000},{"name":"奥运村西","x":116.3694810345,"y":40.0035010724,"time":0.752083333333333,"up":0,"off":0,"rest":33,"date":1446026580000},{"name":"林萃路口西","x":116.3683230043,"y":40.0085529805,"time":0.757638888888889,"up":0,"off":0,"rest":32,"date":1446027060000},{"name":"科荟路西口","x":116.3508159446,"y":40.0067064352,"time":0.759050925925926,"up":0,"off":0,"rest":31,"date":1446027182000},{"name":"林大北路东口","x":116.345310001,"y":40.0064330441,"time":0.763043981481481,"up":0,"off":0,"rest":27,"date":1446027527000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615156,"time":0.76728587962963,"up":0,"off":0,"rest":18,"date":1446027893500},{"name":"清华东路西口","x":116.3288281937,"y":39.9956728842,"time":0.771527777777778,"up":0,"off":0,"rest":18,"date":1446028260000},{"name":"东升园","x":116.3267806343,"y":39.98901106,"time":0.775,"up":0,"off":0,"rest":16,"date":1446028560000},{"name":"中关村南路东口","x":116.323769004,"y":39.9796579906,"time":0.776388888888889,"up":0,"off":0,"rest":10,"date":1446028680000},{"name":"中关村南","x":116.3104941625,"y":39.9826000791,"time":0.78056712962963,"up":0,"off":0,"rest":11,"date":1446029041000},{"name":"中关村一街","x":116.3156419908,"y":39.9840593864,"time":0.783032407407407,"up":0,"off":0,"rest":35,"date":1446029254000},{"name":"保福寺桥西","x":116.3243090147,"y":39.9843648396,"time":0.785497685185185,"up":0,"off":0,"rest":35,"date":1446029467000},{"name":"清华东路西口","x":116.3284201309,"y":39.9953479736,"time":0.78994212962963,"up":0,"off":0,"rest":52,"date":1446029851000},{"name":"双清路南口","x":116.3335666026,"y":40.0005615709,"time":0.796712962962963,"up":0,"off":0,"rest":59,"date":1446030436000},{"name":"前八家","x":116.3351199075,"y":40.0053500717,"time":0.799305555555556,"up":0,"off":0,"rest":57,"date":1446030660000},{"name":"科荟路西口","x":116.3509860214,"y":40.0066088246,"time":0.802083333333333,"up":0,"off":0,"rest":43,"date":1446030900000},{"name":"科荟桥东","x":116.3625479987,"y":40.0081725061,"time":0.804166666666667,"up":0,"off":0,"rest":47,"date":1446031080000},{"name":"奥运村西","x":116.3693733353,"y":40.0034940958,"time":0.805520833333333,"up":0,"off":0,"rest":41,"date":1446031197000},{"name":"南沟泥河","x":116.3725799969,"y":40.0003721378,"time":0.806944444444444,"up":0,"off":0,"rest":39,"date":1446031320000},{"name":"慧忠北里","x":116.4016872484,"y":40.0026400699,"time":0.810648148148148,"up":0,"off":0,"rest":36,"date":1446031640000},{"name":"科荟路东口","x":116.4087179971,"y":40.007924394,"time":0.814502314814815,"up":0,"off":0,"rest":32,"date":1446031973000},{"name":"北苑","x":116.4119797963,"y":40.0266370711,"time":0.816608796296296,"up":0,"off":0,"rest":22,"date":1446032155000},{"name":"大羊坊","x":116.4101876147,"y":40.0355529263,"time":0.821678240740741,"up":0,"off":0,"rest":15,"date":1446032593000},{"name":"北苑家园西站","x":116.4174740073,"y":40.0400358869,"time":0.823611111111111,"up":0,"off":0,"rest":9,"date":1446032760000},{"name":"北苑家园","x":116.4219748507,"y":40.0400415344,"time":0.824305555555556,"up":0,"off":0,"rest":2,"date":1446032820000}]}]';
+
+    var busStationArray = eval('('+busStr+')');
+    var stations = busStationArray[0].busdata;
+
+//百度地图API功能------------------------------------------------
+	var map = new BMap.Map("myMap");            // 创建Map实例
+	map.enableScrollWheelZoom();
+
+	//
+	var pointsForMap = [];
+	for(var i=0; i<stations.length; i++){
+		var point = new BMap.Point(stations[i].x,stations[i].y);		
+		pointsForMap.push(point);
+	}
+
+	map.centerAndZoom(new BMap.Point(stations[0].x,stations[0].y), 12); //可视化结果位于视图中央
+
+	var polyline = new BMap.Polyline(pointsForMap);
+	map.addOverlay(polyline);
+
+    var options = {
+        color: 'red'
+    }
+    var pointCollection = new BMap.PointCollection(pointsForMap, options);  // 初始化PointCollection   
+    map.addOverlay(pointCollection);  // 添加Overlay
+
+    map.setViewport(pointsForMap); // 自动适应屏幕大小
+
+
+    function Animation(iconPath){
+        this.iconPath = iconPath;
+        this.tickTime = 40;
+        this.pauseFlag = false;
+        this.markerExist = false; 
+        this.attr = {x:0,y:0,text:"",angle:0,showFlag:true};
+        this.countTime = dayBeginMs;
+        this.actionArray = [];  //数组：存放小车的action（run、stop、hide）函数
+
+        this.addAction = function(func){          
+            this.actionArray.push(func);
+        }
+
+    	//创建小车覆盖物
+    	this.init = function(){
+			var position = new BMap.Point(this.attr.x, this.attr.y);
+			var icon = new BMap.Icon(this.iconPath, new BMap.Size(52,26));
+			this.marker = new BMap.Marker(position,{icon:icon});  	// 创建标注
+			map.addOverlay(this.marker); // 将标注添加到地图中
+            this.markerExist = true;             				
+
+            this.label = new BMap.Label(this.attr.text,{offset:new BMap.Size(-20,-60)});
+            this.label.setStyle({
+                "fontFamily":"微软雅黑",
+                "fontSize":"14px", //字号
+                "border":"0", //边
+                "textAlign":"center", //文字水平居中显示
+            });
+            this.marker.setLabel(this.label);
+    	}
+
+        this.whetherShow = function(){
+            if(this.attr.showFlag == true && this.markerExist == false){
+                this.marker.setLabel(this.label);
+                map.addOverlay(this.marker);
+                this.markerExist = true;
+            }
+            else if(this.attr.showFlag == false && this.markerExist == true){
+                map.removeOverlay(this.marker); 
+                this.markerExist = false;                
+            }
+        }
+
+        this.start = function(){
+            this.init();
+            this.move();
+        }
+
+        this.draw = function(){
+            this.marker.setPosition(new BMap.Point(this.attr.x, this.attr.y));
+            this.marker.setRotation(this.attr.angle);
+            this.label.setContent(this.attr.text);
+            this.whetherShow();
+        }   
+
+        this.move = function(){
+            if(this.pauseFlag == false){
+                //根据当前时间this.countTime计算得到此刻小车的attr
+                for(var i=0; i<this.actionArray.length; i++){   
+                    this.actionArray[i](this.countTime,this.attr);
+                }
+                //画出当前小车的位置以及text
+                this.draw();
+                //重复调用move()自身
+                // var self = this;
+                // setTimeout(function(){self.move();},this.tickTime); // setTimeout(this.move,this.tickTime);
+                this.countTime += 50 * this.tickTime;
+                //console.log("I'm moving");
+            }       
+        }
+
+        this.pause = function(){
+            this.pauseFlag = true;
+        }
+
+        this.conti = function(){
+            this.pauseFlag = false;
+        }
+    }
+
+    function Bus(station){
+        var points = [];
+        points = station;
+        //$.extend(points,station);
+        // var outputStr = JSON.stringify(points);
+        // console.log(outputStr);
+
+        calBusRunAttr = function(timeNow,attrNow){
+            for(var i=0; i+1<points.length; i++){
+            var stopNum;
+            if(i==0) stopNum = 0;
+            else stopNum = 1;
+            if((points[i].date + stopNum*stopTime) < timeNow && points[i+1].date > timeNow){
+                var t1 = timeNow - points[i].date;  //站点i和i+1之间，驶离i站已经有t1时间
+                var t2 = points[i+1].date - points[i].date; //站点i和i+1之间，共间隔t2时间
+                var rate = t1 / t2; //站点i到i+1之间的斜率
+                attrNow.x = rate * (parseFloat(points[i+1].x) - parseFloat(points[i].x)) + parseFloat(points[i].x);
+                attrNow.y = rate * (parseFloat(points[i+1].y) - parseFloat(points[i].y)) + parseFloat(points[i].y); 
+                attrNow.text = points[i].name+"→"+points[i+1].name+"</br>"+points[i].rest+"人";
+                //console.log("I am running and in station "+i);
+                var angle = 0;
+                if(parseFloat(points[i+1].x) == parseFloat(points[i].x)){//斜率为无穷大
+                    if(parseFloat(points[i+1].y) > parseFloat(points[i].y))angle = 90;
+                    else angle = -90;
+                }else{
+                    var k = (parseFloat(points[i+1].y) - parseFloat(points[i].y))/(parseFloat(points[i+1].x) - parseFloat(points[i].x));
+                    var theta = Math.atan(k);           //弧度（-PI/2,PI/2）
+                    angle = 180 * theta / Math.PI;  //角度
+                    if((parseFloat(points[i+1].x) < parseFloat(points[i].x)))angle += 180;
+                }
+                attrNow.angle = -angle;
+                break;
+            }
+            }
+        }
+
+        calBusStopAttr = function(timeNow,attrNow){
+            for(var i=0; i+1<points.length; i++){
+                if(timeNow >= points[i+1].date &&
+                    timeNow <= (points[i+1].date+stopTime)){
+                    attrNow.text = points[i+1].name+"</br>"+"+"+points[i+1].up+"人"+"</br>"+"-"+points[i+1].off+"人";
+                    console.log("I am stopping in station "+(i+1));
+                    break;
+                }
+            }
+        }
+
+        calBusHideAttr = function(timeNow,attrNow){
+            if(timeNow >= points[points.length-1].date + stopTime){
+                attrNow.showFlag = false;
+            }
+            else{
+                attrNow.showFlag = true;
+            }
+        }
+
+        var bus = new Animation("car.png");
+        bus.addAction(calBusRunAttr);
+        bus.addAction(calBusStopAttr);
+        bus.addAction(calBusHideAttr);
+
+        this.start = function(){
+            bus.start(); //init + move(once)
+        }
+
+        this.pause = function(){
+            bus.pause();
+        }
+
+        this.conti = function(){
+            bus.conti();
+        }
+
+        this.move = function(){
+            bus.move();
+        }
+
+        // this.hide = function(){
+        //     bus.hide();
+        // }
+    }
+    
+    var stopTime = 10000;
+    var dayBeginMs = 0;
+    function getDayBegin(){
+        dayBeginMs = busStationArray[0].busdata[0].date;
+        for(var i=1; i<busStationArray.length; i++){
+            var temp = busStationArray[i].busdata[0].date;
+            if(dayBeginMs > temp)dayBeginMs = temp;
+        }
+    }
+    
+    var busQueue = [];
+    function start(){
+        for(var i=0; i<busStationArray.length; i++){
+            var bus = new Bus(busStationArray[i].busdata);
+            busQueue.push(bus);       
+        }
+        for(var i=0; i<busQueue.length; i++){
+            busQueue[i].start();
+        }
+    }
+
+    function move(){
+        for(var i=0; i<busQueue.length; i++){
+            busQueue[i].move();
+        }
+        setTimeout(function(){
+            move();
+        },40)
+    }
+
+    // function pause(){
+    //    for(var i=0; i<busQueue.length; i++){
+    //         busQueue[i].pause();
+    //     } 
+    // }
+
+    // function conti(){
+    //    for(var i=0; i<busQueue.length; i++){
+    //         busQueue[i].conti();
+    //     } 
+    //     move();
+    // }
+
+    
+
+    $("run").onclick = function(){
+        getDayBegin();
+        dayBeginMs = 1446023160000;
+        start();
+        move();
+    }  
+    // $("pause").onclick = function(){
+    //     bus.pause();
+    // }
+    // $("continue").onclick = function(){
+    //     bus.conti();
+    // }
+    // // $("show").onclick = function(){
+    // //     lushu.showInfoWindow();
+    // // }
+    function $(element){
+        return document.getElementById(element);
+    }
+ 
+</script>

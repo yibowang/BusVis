@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<style type="text/css">@import 'fauxconsole.css';</style> <!-- IE浏览器下使用console.log -->
+	<script type="text/javascript" src="fauxconsole.js"></script> <!-- IE浏览器下使用console.log -->
+
+	<style type="text/css">
+		body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#myMap{height:600px;width:100%;}
+	</style>
+
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=inGwP7mGu57t6fPT0OVmBY35"></script>
+	<script type="text/javascript" src="jquery.js"></script>
+
+
+
+	<title>公交/地铁线路查询</title>
+</head>
+<body>
+	<div id="myMap"></div>
+    速度
+    <input type="text" id="speedRate" style="width:50px;" value="50"/>
+    <!-- <input type="button" value="动画展示" onclick="run(0)">
+    <input type="button" value="暂停" onclick="pause();">
+    <input type="button" value="继续" onclick="conti();"> -->
+    <button id="run" >run</button> 
+    <button id="pause">pause</button> 
+    <button id="continue">continue</button> 
+
+    
+
+</body>
+</html>
+
+<script type="text/javascript">
+
+
+	var pointsstr='[{"name":"中关村南","x":"116.3104944790","y":"39.9825960940","time":"07:06:00","date":1399676760000,"up":2,"off":0,"rest":2},{"name":"中关村一街","x":"116.3156419908","y":"39.9840593864","time":"07:09:00","date":1399676940000,"up":3,"off":0,"rest":5},{"name":"保福寺桥西","x":"116.3243090147","y":"39.9843648396","time":"07:13:00","date":1399677180000,"up":2,"off":1,"rest":6},{"name":"保福寺桥北","x":"116.3270872367","y":"39.9857180784","time":"07:14:00","date":1399677240000,"up":1,"off":0,"rest":7},{"name":"东升园","x":"116.3269191733","y":"39.9890470762","time":"07:19:50","date":1399677590000,"up":0,"off":1,"rest":6},{"name":"清华东路西口","x":"116.3284201309","y":"39.9953479736","time":"07:20:22","date":1399677622000,"up":0,"off":1,"rest":5},{"name":"双清路南口","x":"116.3335666026","y":"40.0005615709","time":"07:24:20","date":1399677860000,"up":0,"off":1,"rest":4},{"name":"前八家","x":"116.3351199075","y":"40.0053500717","time":"07:25:05","date":1399677905000,"up":0,"off":0,"rest":4},{"name":"柏儒苑","x":"116.3381690013","y":"40.0062939035","time":"07:26:00","date":1399677960000,"up":2,"off":0,"rest":6},{"name":"林大北路东口","x":"116.3443749984","y":"40.0063681250","time":"07:28:00","date":1399678080000,"up":7,"off":0,"rest":13},{"name":"科荟路西口","x":"116.3509860214","y":"40.0066088246","time":"07:30:00","date":1399678200000,"up":1,"off":0,"rest":14},{"name":"科荟桥东","x":"116.3625479987","y":"40.0081725061","time":"07:32:00","date":1399678320000,"up":6,"off":6,"rest":14},{"name":"林萃路口西","x":"116.3681889997","y":"40.0084249218","time":"07:33:00","date":1399678380000,"up":2,"off":0,"rest":16},{"name":"奥运村西","x":"116.3693733353","y":"40.0034940958","time":"07:36:00","date":1399678560000,"up":3,"off":1,"rest":18},{"name":"南沟泥河","x":"116.3725799969","y":"40.0003721378","time":"07:39:00","date":1399678740000,"up":1,"off":5,"rest":14},{"name":"慧忠北里","x":"116.4016872484","y":"40.0026400699","time":"07:44:05","date":1399679045000,"up":0,"off":10,"rest":4},{"name":"科荟路东口","x":"116.4087179971","y":"40.0079243940","time":"07:47:05","date":1399679225000,"up":0,"off":0,"rest":4},{"name":"辛店村","x":"116.4107857978","y":"40.0142340935","time":"07:50:19","date":1399679419000,"up":0,"off":0,"rest":4},{"name":"北苑","x":"116.4119797963","y":"40.0266370711","time":"07:53:00","date":1399679580000,"up":0,"off":0,"rest":4},{"name":"大羊坊","x":"116.4101876147","y":"40.0355529263","time":"07:55:19","date":1399679719000,"up":0,"off":2,"rest":2},{"name":"大羊坊东站","x":"116.4146350334","y":"40.0361113592","time":"07:58:59","date":1399679939000,"up":3,"off":1,"rest":4},{"name":"北苑家园西站","x":"116.4174740073","y":"40.0400358869","time":"08:00:19","date":1399680019000,"up":0,"off":1,"rest":3},{"name":"北苑家园","x":"116.4219748507","y":"40.0400415344","time":"08:02:32","date":1399680152000,"up":0,"off":3,"rest":0}]';
+
+	var points = eval('('+pointsstr+')');
+
+//百度地图API功能------------------------------------------------
+	var map = new BMap.Map("myMap");            // 创建Map实例
+	map.enableScrollWheelZoom();
+
+	//
+	var pointsForMap = [];
+	for(var i=0; i<points.length; i++){
+		var point = new BMap.Point(points[i].x,points[i].y);		
+		pointsForMap.push(point);
+	}
+
+	map.centerAndZoom(new BMap.Point(points[0].x,points[0].y), 12); //可视化结果位于视图中央
+
+	var polyline = new BMap.Polyline(pointsForMap);
+	map.addOverlay(polyline);
+
+    var options = {
+        color: 'red'
+    }
+    var pointCollection = new BMap.PointCollection(pointsForMap, options);  // 初始化PointCollection   
+    map.addOverlay(pointCollection);  // 添加Overlay
+
+    map.setViewport(pointsForMap); // 自动适应屏幕大小
+
+
+    var dayBeginMs = points[0].date;
+    //var speedRate = parseInt($("#speedRate").val());   //获取用户指定的加速比例$("#speedRate").value()
+    var stopTime = 10000;
+
+    function Animation(iconPath){
+        this.iconPath = iconPath;
+        this.tickTime = 40;
+        this.pauseFlag = false;
+        this.markerExist = false; 
+        this.attr = {x:0,y:0,text:"",showFlag:true};
+        this.countTime = dayBeginMs;
+        this.actionArray = [];
+
+    	//创建小车覆盖物
+    	this.init = function(){
+			var position = new BMap.Point(this.attr.x, this.attr.y);
+			var icon = new BMap.Icon(this.iconPath, new BMap.Size(52,26));
+			this.marker = new BMap.Marker(position,{icon:icon});  	// 创建标注
+			map.addOverlay(this.marker); // 将标注添加到地图中
+            this.markerExist = true;             				
+
+            this.label = new BMap.Label(this.attr.text,{offset:new BMap.Size(-20,-60)});
+
+            this.label.setStyle({
+                "fontFamily":"微软雅黑",
+                "fontSize":"14px", //字号
+                "border":"0", //边
+                "textAlign":"center", //文字水平居中显示
+            });
+
+            this.marker.setLabel(this.label);
+    	}
+
+        this.start = function(){
+            this.init();
+            this.move();
+        }
+        this.whetherShow = function(){
+            if(this.attr.showFlag == true && this.markerExist == false){
+                this.marker.setLabel(this.label);
+                map.addOverlay(this.marker);
+                this.markerExist = true;
+            }
+            else if(this.attr.showFlag == false && this.markerExist == true){
+                map.removeOverlay(this.marker); 
+                this.markerExist = false;                
+            }
+        }
+
+        this.draw = function(){
+            this.marker.setPosition(new BMap.Point(this.attr.x, this.attr.y));
+            this.label.setContent(this.attr.text);
+            this.whetherShow();
+        }   
+
+        this.addAction = function(func){          
+            this.actionArray.push(func);
+        }
+
+
+        this.move = function(){
+            
+            if(this.pauseFlag == false){
+                //根据当前时间this.countTime计算得到此刻小车的attr
+                for(var i=0; i<this.actionArray.length; i++){   
+                    this.actionArray[i](this.countTime,this.attr);
+                }
+                //画出当前小车的位置以及text
+
+                this.draw();
+                //重复调用move()自身
+                var self = this;
+                setTimeout(function(){self.move();},this.tickTime); // setTimeout(this.move,this.tickTime);
+                this.countTime += 50 * this.tickTime;
+                //console.log("I'm moving");
+            }
+            
+        }
+
+        this.pause = function(){
+            this.pauseFlag = true;
+        }
+    }
+
+    carRun = function(timeNow,attrNow){
+        for(var i=0; i+1<points.length; i++){
+            var stopNum;
+            if(i==0) stopNum = 0;
+            else stopNum = 1;
+            if((points[i].date + stopNum*stopTime) < timeNow && points[i+1].date > timeNow){
+                var t1 = timeNow - points[i].date;  //站点i和i+1之间，驶离i站已经有t1时间
+                var t2 = points[i+1].date - points[i].date; //站点i和i+1之间，共间隔t2时间
+                var rate = t1 / t2; //站点i到i+1之间的斜率
+                attrNow.x = rate * (parseFloat(points[i+1].x) - parseFloat(points[i].x)) + parseFloat(points[i].x);
+                attrNow.y = rate * (parseFloat(points[i+1].y) - parseFloat(points[i].y)) + parseFloat(points[i].y); 
+                attrNow.text = points[i].name+"→"+points[i+1].name+"</br>"+points[i].rest+"人";
+                //console.log("I am running and in station "+i);
+                break;
+            }
+        }
+    }
+
+    carStop = function(timeNow,attrNow){
+        for(var i=0; i+1<points.length; i++){
+            if(timeNow >= points[i+1].date &&
+                timeNow <= (points[i+1].date+stopTime)){
+                attrNow.text = points[i+1].name+"</br>"+"+"+points[i+1].up+"人"+"</br>"+"-"+points[i+1].off+"人";
+                console.log("I am stopping in station "+(i+1));
+                break;
+            }
+        }
+    }
+
+    carHide = function(timeNow,attrNow){
+        if(timeNow >= points[points.length-1].date + stopTime){
+            attrNow.showFlag = false;
+        }
+        else{
+            attrNow.showFlag = true;
+        }
+    }
+
+    var car = new Animation("car.png");
+    car.addAction(carRun);
+    car.addAction(carStop);
+    car.addAction(carHide);
+
+
+    $("run").onclick = function(){
+        car.start();
+    }  
+    $("pause").onclick = function(){
+        car.pause();
+    }
+    $("continue").onclick = function(){
+        car.pause();
+    }
+    // $("show").onclick = function(){
+    //     lushu.showInfoWindow();
+    // }
+    function $(element){
+        return document.getElementById(element);
+    }
+ 
+</script>

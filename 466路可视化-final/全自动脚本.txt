@@ -1,0 +1,543 @@
+Sub 按照uptime排序()
+'
+' 宏3 宏
+'
+
+'
+    count = Worksheets("原始数据").UsedRange.Rows.count
+
+    Application.CutCopyMode = False
+    ActiveWorkbook.Worksheets("原始数据").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("原始数据").Sort.SortFields.Add Key:=Range("C2:C" + CStr(count)), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("原始数据").Sort
+        .SetRange Range("A1:K" + CStr(count))
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+End Sub
+Sub 按照offtime排序()
+'
+' 按照offtime排序 宏
+'
+
+'
+    count = Worksheets("原始数据").UsedRange.Rows.count
+    
+    
+    ActiveWorkbook.Worksheets("原始数据").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("原始数据").Sort.SortFields.Add Key:=Range("B2:B" + CStr(count)), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("原始数据").Sort
+        .SetRange Range("A1:K" + CStr(count))
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    ActiveWindow.SmallScroll Down:=-69
+End Sub
+Sub 上站排序压缩()
+'
+' 宏5 宏
+'
+
+'
+
+Worksheets.Add(After:=Worksheets(Worksheets.count)).Name = "结果表"
+
+
+Dim count
+count = 2
+
+Worksheets("结果表").Cells(1, 1) = "上车时间"
+Worksheets("结果表").Cells(1, 2) = "up"
+Worksheets("结果表").Cells(1, 3) = "off"
+Worksheets("结果表").Cells(1, 4) = "count"
+
+
+For Row = 2 To Worksheets("原始数据").UsedRange.Rows.count
+    
+    If (IsEmpty(Worksheets("原始数据").Cells(Row, 1))) Then
+    
+    Else
+        up = Worksheets("原始数据").Cells(Row, 4).Value
+        uppre = Worksheets("原始数据").Cells(Row + 1, 4).Value
+        If (up <> uppre) Then
+            Worksheets("结果表").Cells(count, 1) = Worksheets("原始数据").Cells(Row, 3).Value
+            Worksheets("结果表").Cells(count, 2) = Worksheets("原始数据").Cells(Row, 4).Value
+            Worksheets("结果表").Cells(count, 3) = Worksheets("原始数据").Cells(Row, 5).Value
+        End If
+        
+        cc = Worksheets("结果表").Cells(count, 4).Value
+        If (IsEmpty(Worksheets("结果表").Cells(count, 4))) Then
+            cc = 0
+        End If
+        Worksheets("结果表").Cells(count, 4) = cc + 1
+        
+        If (up <> uppre) Then
+            count = count + 1
+        End If
+    End If
+    
+    
+Next
+
+
+
+
+
+End Sub
+
+Sub 上站添加物理站()
+
+Worksheets("结果表").Cells(1, 5) = "物理站"
+Worksheets("结果表").Cells(1, 6) = "x"
+Worksheets("结果表").Cells(1, 7) = "y"
+Worksheets("结果表").Cells(1, 8) = "名称"
+Worksheets("结果表").Cells(1, 9) = "属性"
+
+
+For Row = 2 To Worksheets("结果表").UsedRange.Rows.count
+    jijia = Worksheets("结果表").Cells(Row, 2)
+    off = Worksheets("结果表").Cells(Row, 3)
+    If (jijia > off) Then
+    
+    Worksheets("结果表").Cells(Row, 5) = Worksheets("计价站映射表").Cells(jijia + 1, 2)
+    Worksheets("结果表").Cells(Row, 6) = Worksheets("计价站映射表").Cells(jijia + 1, 3)
+    Worksheets("结果表").Cells(Row, 7) = Worksheets("计价站映射表").Cells(jijia + 1, 4)
+    Worksheets("结果表").Cells(Row, 8) = Worksheets("计价站映射表").Cells(jijia + 1, 5)
+    
+    Else
+    
+    Worksheets("结果表").Cells(Row, 5) = Worksheets("计价站映射表").Cells(jijia + 1, 9)
+    Worksheets("结果表").Cells(Row, 6) = Worksheets("计价站映射表").Cells(jijia + 1, 10)
+    Worksheets("结果表").Cells(Row, 7) = Worksheets("计价站映射表").Cells(jijia + 1, 11)
+    Worksheets("结果表").Cells(Row, 8) = Worksheets("计价站映射表").Cells(jijia + 1, 12)
+    
+    End If
+    
+    Worksheets("结果表").Cells(Row, 9) = "up"
+    
+Next
+
+End Sub
+
+Sub 下站排序压缩()
+'
+' 宏5 宏
+'
+
+'
+
+Dim counton
+Dim count
+count = Worksheets("结果表").UsedRange.Rows.count + 1
+counton = count
+
+
+
+For Row = 2 To Worksheets("原始数据").UsedRange.Rows.count
+
+    If (IsEmpty(Worksheets("原始数据").Cells(Row, 1))) Then
+    
+    Else
+        
+        up = Worksheets("原始数据").Cells(Row, 5).Value
+        uppre = Worksheets("原始数据").Cells(Row + 1, 5).Value
+        If (up <> uppre) Then
+            Worksheets("结果表").Cells(count, 1) = Worksheets("原始数据").Cells(Row, 2).Value
+            Worksheets("结果表").Cells(count, 2) = Worksheets("原始数据").Cells(Row, 4).Value
+            Worksheets("结果表").Cells(count, 3) = Worksheets("原始数据").Cells(Row, 5).Value
+        End If
+        
+        cc = Worksheets("结果表").Cells(count, 4).Value
+        If (IsEmpty(Worksheets("结果表").Cells(count, 4))) Then
+            cc = 0
+        End If
+        Worksheets("结果表").Cells(count, 4) = cc + 1
+        
+        If (up <> uppre) Then
+            count = count + 1
+        End If
+    End If
+    
+    
+Next
+
+
+
+
+
+For Row = counton To Worksheets("结果表").UsedRange.Rows.count
+    jijia = Worksheets("结果表").Cells(Row, 2)
+    off = Worksheets("结果表").Cells(Row, 3)
+    If (jijia > off) Then
+    
+    Worksheets("结果表").Cells(Row, 5) = Worksheets("计价站映射表").Cells(off + 1, 2)
+    Worksheets("结果表").Cells(Row, 6) = Worksheets("计价站映射表").Cells(off + 1, 3)
+    Worksheets("结果表").Cells(Row, 7) = Worksheets("计价站映射表").Cells(off + 1, 4)
+    Worksheets("结果表").Cells(Row, 8) = Worksheets("计价站映射表").Cells(off + 1, 5)
+    
+    Else
+    
+    Worksheets("结果表").Cells(Row, 5) = Worksheets("计价站映射表").Cells(off + 1, 9)
+    Worksheets("结果表").Cells(Row, 6) = Worksheets("计价站映射表").Cells(off + 1, 10)
+    Worksheets("结果表").Cells(Row, 7) = Worksheets("计价站映射表").Cells(off + 1, 11)
+    Worksheets("结果表").Cells(Row, 8) = Worksheets("计价站映射表").Cells(off + 1, 12)
+    
+    End If
+    
+    Worksheets("结果表").Cells(Row, 9) = "off"
+    
+Next
+
+End Sub
+Sub 排序到站时间()
+'
+' 宏2 宏
+'
+
+'
+    count = Worksheets("原始数据").UsedRange.Rows.count
+
+    ActiveWorkbook.Worksheets("结果表").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("结果表").Sort.SortFields.Add Key:=Range("A2:A24" + CStr(count)), _
+        SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    With ActiveWorkbook.Worksheets("结果表").Sort
+        .SetRange Range("A1:I" + CStr(count))
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+End Sub
+
+Sub 合并()
+
+
+Dim rightcount
+
+rightcount = 0
+
+Worksheets("结果表").Cells(1, 10) = "name"
+Worksheets("结果表").Cells(1, 11) = "x"
+Worksheets("结果表").Cells(1, 12) = "y"
+Worksheets("结果表").Cells(1, 13) = "time"
+Worksheets("结果表").Cells(1, 14) = "upc"
+Worksheets("结果表").Cells(1, 15) = "offc"
+Worksheets("结果表").Cells(1, 17) = "No"
+Worksheets("结果表").Cells(1, 18) = "NoJ"
+Worksheets("结果表").Cells(1, 19) = "flag"
+
+Worksheets("结果表").Cells(2, 10) = Worksheets("结果表").Cells(2, 8)
+Worksheets("结果表").Cells(2, 11) = Worksheets("结果表").Cells(2, 6)
+Worksheets("结果表").Cells(2, 12) = Worksheets("结果表").Cells(2, 7)
+Worksheets("结果表").Cells(2, 13) = Worksheets("结果表").Cells(2, 1)
+Worksheets("结果表").Cells(2, 17) = Worksheets("结果表").Cells(2, 5)
+
+If Worksheets("结果表").Cells(2, 9) = "up" Then
+Worksheets("结果表").Cells(2, 14) = Worksheets("结果表").Cells(2, 4)
+Worksheets("结果表").Cells(2, 15) = 0
+Worksheets("结果表").Cells(2, 18) = Worksheets("结果表").Cells(2, 2)
+Else
+Worksheets("结果表").Cells(2, 14) = 0
+Worksheets("结果表").Cells(2, 15) = Worksheets("结果表").Cells(2, 4)
+Worksheets("结果表").Cells(2, 18) = Worksheets("结果表").Cells(2, 3)
+
+End If
+
+up = Worksheets("结果表").Cells(2, 2)
+off = Worksheets("结果表").Cells(2, 3)
+If up < off Then
+Worksheets("结果表").Cells(2, 19) = "bigger"
+Else
+Worksheets("结果表").Cells(2, 19) = "smaller"
+End If
+
+
+
+
+rightcount = rightcount + 1
+
+For Row = 3 To Worksheets("结果表").UsedRange.Rows.count
+    attrpre = Worksheets("结果表").Cells(Row - 1, 9)
+    attrt = Worksheets("结果表").Cells(Row, 9)
+    
+    attrpreN = Worksheets("结果表").Cells(Row - 1, 2)
+    
+    If attrpre = "off" Then
+    attrpreN = Worksheets("结果表").Cells(Row - 1, 3)
+    End If
+    
+    attrtN = Worksheets("结果表").Cells(Row, 2)
+    
+    If attrt = "off" Then
+    attrtN = Worksheets("结果表").Cells(Row, 3)
+    End If
+    
+    If (attrt <> attrpre) And (attrpreN = attrtN) Then
+        If attrt = "up" Then
+            Worksheets("结果表").Cells(rightcount + 1, 14) = Worksheets("结果表").Cells(Row, 4)
+            
+        Else
+            Worksheets("结果表").Cells(rightcount + 1, 15) = Worksheets("结果表").Cells(Row, 4)
+            
+        End If
+    Else
+        Worksheets("结果表").Cells(rightcount + 2, 10) = Worksheets("结果表").Cells(Row, 8)
+        Worksheets("结果表").Cells(rightcount + 2, 11) = Worksheets("结果表").Cells(Row, 6)
+        Worksheets("结果表").Cells(rightcount + 2, 12) = Worksheets("结果表").Cells(Row, 7)
+        Worksheets("结果表").Cells(rightcount + 2, 13) = Worksheets("结果表").Cells(Row, 1)
+        Worksheets("结果表").Cells(rightcount + 2, 17) = Worksheets("结果表").Cells(Row, 5)
+
+        If attrt = "up" Then
+            Worksheets("结果表").Cells(rightcount + 2, 14) = Worksheets("结果表").Cells(Row, 4)
+            Worksheets("结果表").Cells(rightcount + 2, 15) = 0
+            Worksheets("结果表").Cells(rightcount + 2, 18) = Worksheets("结果表").Cells(Row, 2)
+        Else
+            Worksheets("结果表").Cells(rightcount + 2, 14) = 0
+            Worksheets("结果表").Cells(rightcount + 2, 15) = Worksheets("结果表").Cells(Row, 4)
+            Worksheets("结果表").Cells(rightcount + 2, 18) = Worksheets("结果表").Cells(Row, 3)
+        End If
+        
+        up = Worksheets("结果表").Cells(Row, 2)
+        off = Worksheets("结果表").Cells(Row, 3)
+        If up < off Then
+            Worksheets("结果表").Cells(rightcount + 2, 19) = "bigger"
+        Else
+            Worksheets("结果表").Cells(rightcount + 2, 19) = "smaller"
+        End If
+
+        
+        
+        rightcount = rightcount + 1
+
+    End If
+Next
+
+
+    Columns("A:I").Select
+    Selection.ClearContents
+    Columns("J:S").Select
+    Selection.Cut
+    Range("A1").Select
+    ActiveSheet.Paste
+End Sub
+
+Sub Rest()
+    
+Worksheets("结果表").Cells(1, 7) = "rest"
+Worksheets("结果表").Cells(2, 7) = Worksheets("结果表").Cells(2, 5) - Worksheets("结果表").Cells(2, 6)
+
+For Row = 3 To Worksheets("结果表").UsedRange.Rows.count
+
+lastc = Worksheets("结果表").Cells(Row - 1, 7)
+up = Worksheets("结果表").Cells(Row, 5)
+off = Worksheets("结果表").Cells(Row, 6)
+
+If (off > lastc) Then
+Worksheets("结果表").Cells(Row, 7) = up
+Worksheets("结果表").Cells(Row - 1, 7) = off
+Else
+Worksheets("结果表").Cells(Row, 7) = lastc + up - off
+End If
+
+
+Next
+
+End Sub
+Sub toJason()
+
+' converto to json
+
+Dim str As String
+Dim str2 As String
+
+
+str = "["
+
+
+For Row = 2 To Worksheets("结果表").UsedRange.Rows.count
+If IsEmpty(Worksheets("结果表").Cells(Row, 1)) Then
+Else
+
+If Row = 2 Then
+
+Else
+str = str + ","
+End If
+
+
+str = str + "{name:" + """" + Worksheets("结果表").Cells(Row, 1) + ""","
+str = str + "x:" + CStr(Worksheets("结果表").Cells(Row, 2)) + ","
+str = str + "y:" + CStr(Worksheets("结果表").Cells(Row, 3)) + ","
+
+str = str + "time:" + CStr(Worksheets("结果表").Cells(Row, 4)) + ","
+str = str + "up:" + CStr(Worksheets("结果表").Cells(Row, 5)) + ","
+str = str + "off:" + CStr(Worksheets("结果表").Cells(Row, 6)) + ","
+str = str + "rest:" + CStr(Worksheets("结果表").Cells(Row, 7))
+str = str + str2 + "}"
+
+End If
+
+Next
+
+str = str + "]"
+
+Worksheets("结果表").Cells(1, 9) = str
+
+
+End Sub
+
+Sub WangAuto()
+'
+' WangAuto 宏
+'
+
+'
+    Call 按照uptime排序
+    Call 上站排序压缩
+    Call 上站添加物理站
+    Call 按照offtime排序
+    
+    Call 下站排序压缩
+    Call 排序到站时间
+    Call 合并
+    Call Rest
+    
+        
+    
+End Sub
+
+
+Sub 插值()
+
+Dim offset
+'在右边处理表格
+offset = 15
+
+Dim maxNoJ
+maxNoJ = Worksheets("计价站映射表").UsedRange.Rows.count - 1
+
+
+Worksheets("结果表").Cells(2, 1 + offset) = Worksheets("结果表").Cells(2, 1)
+Worksheets("结果表").Cells(2, 2 + offset) = Worksheets("结果表").Cells(2, 2)
+Worksheets("结果表").Cells(2, 3 + offset) = Worksheets("结果表").Cells(2, 3)
+Worksheets("结果表").Cells(2, 4 + offset) = Worksheets("结果表").Cells(2, 4)
+Worksheets("结果表").Cells(2, 5 + offset) = Worksheets("结果表").Cells(2, 5)
+Worksheets("结果表").Cells(2, 6 + offset) = Worksheets("结果表").Cells(2, 6)
+Worksheets("结果表").Cells(2, 7 + offset) = Worksheets("结果表").Cells(2, 7)
+Worksheets("结果表").Cells(2, 8 + offset) = Worksheets("结果表").Cells(2, 8)
+Worksheets("结果表").Cells(2, 9 + offset) = Worksheets("结果表").Cells(2, 9)
+Worksheets("结果表").Cells(2, 10 + offset) = Worksheets("结果表").Cells(2, 10)
+
+countNow = Worksheets("结果表").UsedRange.Rows.count
+
+rightcount = 1
+
+For Row = 2 To countNow - 1
+
+flag = Worksheets("结果表").Cells(Row, 10)
+noj = Worksheets("结果表").Cells(Row, 9)
+flagNext = Worksheets("结果表").Cells(Row + 1, 10)
+noJNext = Worksheets("结果表").Cells(Row + 1, 9)
+
+If flag = "bigger" Then
+    flagN = 1
+    If flagNext = "bigger" Then
+        deltaN = noJNext - noj
+    Else 'bigger -> smaller
+        deltaN = maxNoJ - noj + maxNoJ - noJNext
+    End If
+Else
+    flagN = -1
+    If flagNext = "bigger" Then
+        deltaN = noj - 1 + noJNext - 1
+    Else
+        deltaN = noj - noJNext
+    End If
+
+End If
+
+If deltaN > 0 Then
+    
+    mtime = Worksheets("结果表").Cells(Row, 4)
+    mtimeNext = Worksheets("结果表").Cells(Row + 1, 4)
+    
+    
+    For dd = 1 To deltaN
+        
+        
+        'Worksheets("结果表").Cells(rightcount + 2, 1 + offset) = Worksheets("结果表").Cells(Row, 1)
+        'time
+        'Worksheets("结果表").Cells(rightcount + 2, 2 + offset) = Worksheets("结果表").Cells(Row, 2)
+        
+        'upc
+        Worksheets("结果表").Cells(rightcount + 2, 5 + offset) = 0
+        'offc
+        Worksheets("结果表").Cells(rightcount + 2, 6 + offset) = 0
+        'rest
+        Worksheets("结果表").Cells(rightcount + 2, 7 + offset) = Worksheets("结果表").Cells(Row, 7)
+        'No
+        'Worksheets("结果表").Cells(rightcount + 2, 8 + offset) = Worksheets("结果表").Cells(Row, 8)
+        'NoJ
+        'Worksheets("结果表").Cells(rightcount + 2, 9 + offset) = Worksheets("结果表").Cells(Row, 9)
+        rightNoj = noj + flagN * dd
+        If rightNoj < 1 Then
+            rightNoj = 1 + 1 - rightNoj
+        End If
+        If rightNoj > maxNoJ Then
+            rightNoj = maxNoJ - (rightNoj - maxNoJ)
+        End If
+        Worksheets("结果表").Cells(rightcount + 2, 9 + offset) = rightNoj
+        
+        'name
+        If flagNext = "bigger" Then
+            Worksheets("结果表").Cells(rightcount + 2, 1 + offset) = Worksheets("计价站映射表").Cells(rightNoj + 1, 12)
+            Worksheets("结果表").Cells(rightcount + 2, 2 + offset) = Worksheets("计价站映射表").Cells(rightNoj + 1, 10)
+            Worksheets("结果表").Cells(rightcount + 2, 3 + offset) = Worksheets("计价站映射表").Cells(rightNoj + 1, 11)
+        Else
+            Worksheets("结果表").Cells(rightcount + 2, 1 + offset) = Worksheets("计价站映射表").Cells(rightNoj + 1, 5)
+            Worksheets("结果表").Cells(rightcount + 2, 2 + offset) = Worksheets("计价站映射表").Cells(rightNoj + 1, 3)
+            Worksheets("结果表").Cells(rightcount + 2, 3 + offset) = Worksheets("计价站映射表").Cells(rightNoj + 1, 4)
+        End If
+        
+        
+        Worksheets("结果表").Cells(rightcount + 2, 4 + offset) = (mtimeNext - mtime) / deltaN * dd + mtime
+        'flag
+        Worksheets("结果表").Cells(rightcount + 2, 10 + offset) = Worksheets("结果表").Cells(Row + 1, 10)
+        
+        
+        rightcount = rightcount + 1
+    Next
+End If
+
+Next
+
+    Columns("A:J").Select
+    Selection.ClearContents
+    Columns("P:Y").Select
+    Selection.Cut
+    Range("A1").Select
+    ActiveSheet.Paste
+    
+Worksheets("结果表").Cells(1, 1) = "name"
+Worksheets("结果表").Cells(1, 2) = "x"
+Worksheets("结果表").Cells(1, 3) = "y"
+Worksheets("结果表").Cells(1, 4) = "time"
+Worksheets("结果表").Cells(1, 5) = "upc"
+Worksheets("结果表").Cells(1, 6) = "offc"
+Worksheets("结果表").Cells(1, 7) = "rest"
+Worksheets("结果表").Cells(1, 8) = "No"
+Worksheets("结果表").Cells(1, 9) = "NoJ"
+Worksheets("结果表").Cells(1, 10) = "flag"
+
+
+End Sub
+
