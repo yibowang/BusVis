@@ -6,6 +6,7 @@ import(
 	"bytes"
 	"io"
 	"strings"
+	"bufio"
 )
 
 func readLine(file io.Reader) ([]string){
@@ -35,11 +36,15 @@ func readLine(file io.Reader) ([]string){
 		} else if isfirst == 1{
 			strbuf.Write(buf)
 		}
-		
 	}
 }
+type FileBuff struct{
+	file *os.File
+	writer *bufio.Writer
+}
 func devide(file io.Reader,date string){
-	filemap := make(map[string] *os.File)
+	filemap := make(map[string] FileBuff)
+	
 	countline := 0
 	for {
 		line := readLine(file)
@@ -47,30 +52,33 @@ func devide(file io.Reader,date string){
 			return
 		}
 		if strings.HasPrefix(line[3],date)&& strings.HasPrefix(line[4],date) {
-			ofile,find := filemap[line[7]]
+			fb,find := filemap[line[7]]
 			if !find {
 				ofile,err := os.Create(line[7]+".csv")
+				writer := bufio.NewWriter(ofile)
 				if err != nil {
 					panic(err)
 				}
-				filemap[line[7]] = ofile
+				fb =  FileBuff{file:ofile,writer:writer}
+				filemap[line[7]] = fb 
 			}
 			for i,v := range line {
 				if i != 0 {
-					ofile.WriteString(",")
+					fb.writer.WriteString(",")
 				}
-				ofile.WriteString("\"")
-				ofile.WriteString(v)
-				ofile.WriteString("\"")
+				fb.writer.WriteString("\"")
+				fb.writer.WriteString(v)
+				fb.writer.WriteString("\"")
 			}
-			ofile.WriteString("\n")
+			fb.writer.WriteString("\n")
 		}
 		countline++
 		fmt.Printf("%d\r",countline)
 	}
 	defer func(){
 		for _,f := range filemap {
-			f.Close()
+			f.writer.Flush()
+			f.file.Close()
 		}
 	}()
 }
@@ -79,14 +87,24 @@ func testRead(){
 	if err != nil {
 		panic(err)
 	}
+	r := bufio.NewReader(file)
 	defer file.Close()
-	for i := 0;i<10000;i++ {
+	/*for i := 0;i<10000;i++ {
 		line := readLine(file)
 		for _,s := range line {
 			fmt.Print(s)
 			fmt.Print(" ")
 		}
 		fmt.Print("\n")
+	}*/
+	
+	for i:=0; ; {
+		_ = readLine(r)
+		i++
+		fmt.Printf("%d\r",i)
+		if i== 100000 {
+			return
+		}
 	}
 }
 func testDevide(){
@@ -94,9 +112,11 @@ func testDevide(){
 	if err != nil {
 		panic(err)
 	}
+	r := bufio.NewReader(file)
 	defer file.Close()
-	devide(file,"20150807")
+	devide(r,"20150807")
 }
 func main() {
 	testDevide()
+	//testRead()
 }
