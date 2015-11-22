@@ -1,0 +1,91 @@
+
+
+<!-- saved from url=(0051)http://developer.baidu.com/map/jsdemo/demo/i4_4.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+	<style type="text/css">
+		svg{width:100%;height:100%;}
+	</style>
+	<title>公交/地铁线路查询</title>
+</head>
+<body>
+<svg>
+	<path d="M200,200 A100,100 0 0,1 400,200"
+        fill="none" stroke="blue" stroke-width="5" />
+  <circle cx=""></circle>
+</svg>
+</body>
+</html>
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+	// 百度地图API功能
+	function addLine(p1,p2,color,width){
+		var radius = (p1.x - p2.x)/2;
+		var html = '<path d="M'+p1.x+','+p1.y+' A'+radius+','+radius+' 0 0,1 '+p2.x+','+p2.y+'" fill="none" stroke="'+color+'" stroke-width="'+width+'" stroke-opacity="0.4"/>';
+		return html;
+	}
+  function addPoint(p,color,radius){
+    var html = '<circle cx="'+p.x+'" cy="'+p.y+'" r="'+radius+'" stroke="none" fill="'+color+'"/>';
+    return html;
+  }
+  function color(i){
+  var MAXF = 300;
+		var v = Math.floor(i*220/MAXF);
+		if (v>255)v = 255;
+		if(v==0)return"#e7e7e7";
+		return "#"+c2s(v)+c2s(255-v)+"00";
+	}
+  function c2s(v){
+		var trans=['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
+		return trans[Math.floor(v/16)]+trans[v%16];
+	}
+  function display(x,w,data){
+    y = w*data.nodes.length/2;
+    var MaxCircle = 0.4;  //最大流量站半径为w的比例
+    var html = "";
+    var countPoint=[];
+    var namemap=[];
+    var maxCount=0;
+    var maxLinkValue = 0;
+    for(var i = 0;i<data.nodes.length;i++){
+      namemap[data.nodes[i].name] = i;
+    }
+    for(var i = 0;i<data.links.length;i++){
+      data.links[i].source = namemap[data.links[i].source];
+      data.links[i].target = namemap[data.links[i].target];
+      data.links[i].value = parseInt(data.links[i].value);
+      //console.log("s "+data.links[i].source +" t "+data.links[i].target+" v "+data.links[i].value)
+    }
+    for(var i = 0;i<data.links.length;i++){
+      if(!countPoint[data.links[i].source])countPoint[data.links[i].source] = 0;
+      if(!countPoint[data.links[i].target])countPoint[data.links[i].target] = 0;
+      countPoint[data.links[i].source] += data.links[i].value;
+      countPoint[data.links[i].target] += data.links[i].value;
+    }
+    for(var i in countPoint){
+      if(countPoint[i]>maxCount)
+        maxCount = countPoint[i];
+    }
+    for(var i in data.links){
+      if(data.links[i].value>maxLinkValue)maxLinkValue = data.links[i].value;
+    }
+    for(var i = 0;i<data.links.length;i++){
+      var s = data.links[i].source;
+      var t = data.links[i].target;
+      var v = data.links[i].value;
+      html += addLine({x:x+s*w,y:y},{x:x+t*w,y:y},color(v),2*v*w*MaxCircle/maxLinkValue);
+    }
+    for(var i = 0;i<data.nodes.length;i++){
+      html += addPoint({x:x+i*w,y:y},"black",countPoint[i]*w*MaxCircle/maxCount);
+    }
+    $("svg").html(html);
+    $("svg").height(y+w*data.nodes.length/2);
+    $("svg").width(x+w*data.nodes.length);
+  }
+  var data={"links":[{"source":"玉泉路口西","target":"五棵松桥西","value":"87"},{"source":"玉泉路口西","target":"翠微路口","value":"92"},{"source":"玉泉路口西","target":"公主坟","value":"28"},{"source":"玉泉路口西","target":"军事博物馆","value":"107"},{"source":"玉泉路口西","target":"木樨地西","value":"81"},{"source":"老山公交场站","target":"军事博物馆","value":"17"},{"source":"玉泉路口西","target":"工会大楼","value":"93"},{"source":"老山公交场站","target":"木樨地西","value":"11"},{"source":"玉泉路口西","target":"复兴门内","value":"220"},{"source":"老山公交场站","target":"工会大楼","value":"4"},{"source":"老山公交场站","target":"复兴门内","value":"20"},{"source":"玉泉路口西","target":"西单路口东","value":"95"},{"source":"老山公交场站","target":"老山南路东口","value":"19"},{"source":"玉泉路口西","target":"天安门西","value":"80"},{"source":"老山公交场站","target":"西单路口东","value":"19"},{"source":"老山公交场站","target":"地铁八宝山站","value":"64"},{"source":"玉泉路口西","target":"天安门东","value":"88"},{"source":"老山公交场站","target":"天安门西","value":"2"},{"source":"老山公交场站","target":"玉泉路口西","value":"33"},{"source":"玉泉路口西","target":"东单路口西","value":"96"},{"source":"老山公交场站","target":"天安门东","value":"7"},{"source":"玉泉路口西","target":"北京站口东","value":"74"},{"source":"老山公交场站","target":"东单路口西","value":"10"},{"source":"老山公交场站","target":"五棵松桥西","value":"20"},{"source":"老山公交场站","target":"北京站口东","value":"11"},{"source":"老山公交场站","target":"翠微路口","value":"22"},{"source":"老山公交场站","target":"公主坟","value":"20"},{"source":"玉泉路口西","target":"日坛路","value":"29"},{"source":"玉泉路口西","target":"永安里路口西","value":"29"},{"source":"老山公交场站","target":"日坛路","value":"10"},{"source":"玉泉路口西","target":"大北窑西","value":"39"},{"source":"老山公交场站","target":"永安里路口西","value":"4"},{"source":"玉泉路口西","target":"郎家园","value":"70"},{"source":"玉泉路口西","target":"八王坟西","value":"3"},{"source":"老山公交场站","target":"大北窑西","value":"13"},{"source":"老山公交场站","target":"郎家园","value":"15"},{"source":"玉泉路口西","target":"四惠枢纽站","value":"45"},{"source":"老山公交场站","target":"四惠枢纽站","value":"11"},{"source":"军事博物馆","target":"木樨地西","value":"48"},{"source":"军事博物馆","target":"工会大楼","value":"145"},{"source":"复兴门内","target":"西单路口东","value":"280"},{"source":"天安门西","target":"天安门东","value":"96"},{"source":"军事博物馆","target":"复兴门内","value":"138"},{"source":"复兴门内","target":"天安门西","value":"147"},{"source":"天安门西","target":"东单路口西","value":"119"},{"source":"复兴门内","target":"天安门东","value":"194"},{"source":"天安门西","target":"北京站口东","value":"108"},{"source":"军事博物馆","target":"西单路口东","value":"129"},{"source":"复兴门内","target":"东单路口西","value":"261"},{"source":"军事博物馆","target":"天安门西","value":"89"},{"source":"复兴门内","target":"北京站口东","value":"175"},{"source":"军事博物馆","target":"天安门东","value":"76"},{"source":"军事博物馆","target":"东单路口西","value":"99"},{"source":"军事博物馆","target":"北京站口东","value":"71"},{"source":"日坛路","target":"永安里路口西","value":"76"},{"source":"日坛路","target":"大北窑西","value":"168"},{"source":"郎家园","target":"八王坟西","value":"18"},{"source":"日坛路","target":"郎家园","value":"495"},{"source":"日坛路","target":"八王坟西","value":"13"},{"source":"郎家园","target":"四惠枢纽站","value":"434"},{"source":"日坛路","target":"四惠枢纽站","value":"210"},{"source":"北京站口东","target":"日坛路","value":"111"},{"source":"北京站口东","target":"永安里路口西","value":"71"},{"source":"北京站口东","target":"大北窑西","value":"191"},{"source":"天安门西","target":"日坛路","value":"54"},{"source":"北京站口东","target":"郎家园","value":"422"},{"source":"天安门西","target":"永安里路口西","value":"58"},{"source":"北京站口东","target":"八王坟西","value":"17"},{"source":"复兴门内","target":"日坛路","value":"143"},{"source":"天安门西","target":"大北窑西","value":"72"},{"source":"复兴门内","target":"永安里路口西","value":"90"},{"source":"天安门西","target":"郎家园","value":"116"},{"source":"天安门西","target":"八王坟西","value":"10"},{"source":"复兴门内","target":"大北窑西","value":"175"},{"source":"军事博物馆","target":"日坛路","value":"56"},{"source":"北京站口东","target":"四惠枢纽站","value":"154"},{"source":"复兴门内","target":"郎家园","value":"441"},{"source":"军事博物馆","target":"永安里路口西","value":"19"},{"source":"复兴门内","target":"八王坟西","value":"19"},{"source":"军事博物馆","target":"大北窑西","value":"40"},{"source":"天安门西","target":"四惠枢纽站","value":"46"},{"source":"军事博物馆","target":"郎家园","value":"123"},{"source":"军事博物馆","target":"八王坟西","value":"5"},{"source":"复兴门内","target":"四惠枢纽站","value":"233"},{"source":"军事博物馆","target":"四惠枢纽站","value":"61"},{"source":"翠微路口","target":"公主坟","value":"71"},{"source":"公主坟","target":"军事博物馆","value":"53"},{"source":"公主坟","target":"木樨地西","value":"26"},{"source":"老山南路东口","target":"地铁八宝山站","value":"18"},{"source":"公主坟","target":"工会大楼","value":"17"},{"source":"五棵松桥西","target":"军事博物馆","value":"140"},{"source":"老山南路东口","target":"玉泉路口西","value":"24"},{"source":"公主坟","target":"复兴门内","value":"52"},{"source":"五棵松桥西","target":"木樨地西","value":"53"},{"source":"地铁八宝山站","target":"军事博物馆","value":"106"},{"source":"五棵松桥西","target":"工会大楼","value":"109"},{"source":"公主坟","target":"西单路口东","value":"46"},{"source":"地铁八宝山站","target":"木樨地西","value":"88"},{"source":"老山南路东口","target":"五棵松桥西","value":"37"},{"source":"五棵松桥西","target":"复兴门内","value":"194"},{"source":"公主坟","target":"天安门西","value":"21"},{"source":"地铁八宝山站","target":"工会大楼","value":"137"},{"source":"公主坟","target":"天安门东","value":"37"},{"source":"地铁八宝山站","target":"复兴门内","value":"229"},{"source":"老山南路东口","target":"翠微路口","value":"43"},{"source":"五棵松桥西","target":"西单路口东","value":"122"},{"source":"公主坟","target":"东单路口西","value":"51"},{"source":"老山南路东口","target":"公主坟","value":"26"},{"source":"五棵松桥西","target":"天安门西","value":"86"},{"source":"公主坟","target":"北京站口东","value":"38"},{"source":"地铁八宝山站","target":"西单路口东","value":"133"},{"source":"五棵松桥西","target":"天安门东","value":"102"},{"source":"地铁八宝山站","target":"天安门西","value":"74"},{"source":"五棵松桥西","target":"东单路口西","value":"127"},{"source":"地铁八宝山站","target":"天安门东","value":"86"},{"source":"五棵松桥西","target":"北京站口东","value":"92"},{"source":"地铁八宝山站","target":"东单路口西","value":"120"},{"source":"地铁八宝山站","target":"北京站口东","value":"66"},{"source":"公主坟","target":"日坛路","value":"20"},{"source":"公主坟","target":"永安里路口西","value":"17"},{"source":"公主坟","target":"大北窑西","value":"24"},{"source":"五棵松桥西","target":"日坛路","value":"41"},{"source":"公主坟","target":"郎家园","value":"76"},{"source":"五棵松桥西","target":"永安里路口西","value":"29"},{"source":"公主坟","target":"八王坟西","value":"1"},{"source":"地铁八宝山站","target":"日坛路","value":"46"},{"source":"五棵松桥西","target":"大北窑西","value":"52"},{"source":"地铁八宝山站","target":"永安里路口西","value":"26"},{"source":"五棵松桥西","target":"郎家园","value":"113"},{"source":"五棵松桥西","target":"八王坟西","value":"1"},{"source":"地铁八宝山站","target":"大北窑西","value":"54"},{"source":"公主坟","target":"四惠枢纽站","value":"21"},{"source":"地铁八宝山站","target":"郎家园","value":"109"},{"source":"地铁八宝山站","target":"八王坟西","value":"4"},{"source":"五棵松桥西","target":"四惠枢纽站","value":"43"},{"source":"地铁八宝山站","target":"四惠枢纽站","value":"67"},{"source":"工会大楼","target":"复兴门内","value":"213"},{"source":"西单路口东","target":"天安门西","value":"126"},{"source":"东单路口西","target":"北京站口东","value":"239"},{"source":"工会大楼","target":"西单路口东","value":"191"},{"source":"西单路口东","target":"天安门东","value":"167"},{"source":"工会大楼","target":"天安门西","value":"103"},{"source":"西单路口东","target":"东单路口西","value":"238"},{"source":"工会大楼","target":"天安门东","value":"148"},{"source":"西单路口东","target":"北京站口东","value":"163"},{"source":"工会大楼","target":"东单路口西","value":"170"},{"source":"工会大楼","target":"北京站口东","value":"99"},{"source":"大北窑西","target":"郎家园","value":"214"},{"source":"大北窑西","target":"八王坟西","value":"12"},{"source":"大北窑西","target":"四惠枢纽站","value":"123"},{"source":"东单路口西","target":"日坛路","value":"165"},{"source":"东单路口西","target":"永安里路口西","value":"119"},{"source":"西单路口东","target":"日坛路","value":"145"},{"source":"东单路口西","target":"大北窑西","value":"218"},{"source":"西单路口东","target":"永安里路口西","value":"69"},{"source":"东单路口西","target":"郎家园","value":"721"},{"source":"东单路口西","target":"八王坟西","value":"26"},{"source":"工会大楼","target":"日坛路","value":"71"},{"source":"西单路口东","target":"大北窑西","value":"138"},{"source":"工会大楼","target":"永安里路口西","value":"57"},{"source":"西单路口东","target":"郎家园","value":"416"},{"source":"西单路口东","target":"八王坟西","value":"19"},{"source":"工会大楼","target":"大北窑西","value":"102"},{"source":"工会大楼","target":"郎家园","value":"120"},{"source":"东单路口西","target":"四惠枢纽站","value":"428"},{"source":"工会大楼","target":"八王坟西","value":"12"},{"source":"西单路口东","target":"四惠枢纽站","value":"179"},{"source":"工会大楼","target":"四惠枢纽站","value":"88"},{"source":"五棵松桥西","target":"翠微路口","value":"91"},{"source":"五棵松桥西","target":"公主坟","value":"49"},{"source":"地铁八宝山站","target":"玉泉路口西","value":"77"},{"source":"地铁八宝山站","target":"五棵松桥西","value":"96"},{"source":"地铁八宝山站","target":"翠微路口","value":"107"},{"source":"地铁八宝山站","target":"公主坟","value":"38"},{"source":"翠微路口","target":"军事博物馆","value":"169"},{"source":"翠微路口","target":"木樨地西","value":"116"},{"source":"翠微路口","target":"工会大楼","value":"209"},{"source":"翠微路口","target":"复兴门内","value":"347"},{"source":"老山南路东口","target":"军事博物馆","value":"34"},{"source":"翠微路口","target":"西单路口东","value":"254"},{"source":"老山南路东口","target":"木樨地西","value":"40"},{"source":"翠微路口","target":"天安门西","value":"121"},{"source":"老山南路东口","target":"工会大楼","value":"80"},{"source":"翠微路口","target":"天安门东","value":"201"},{"source":"老山南路东口","target":"复兴门内","value":"38"},{"source":"翠微路口","target":"东单路口西","value":"222"},{"source":"翠微路口","target":"北京站口东","value":"101"},{"source":"老山南路东口","target":"西单路口东","value":"22"},{"source":"老山南路东口","target":"天安门西","value":"13"},{"source":"老山南路东口","target":"天安门东","value":"19"},{"source":"老山南路东口","target":"东单路口西","value":"19"},{"source":"老山南路东口","target":"北京站口东","value":"10"},{"source":"翠微路口","target":"日坛路","value":"81"},{"source":"翠微路口","target":"永安里路口西","value":"65"},{"source":"翠微路口","target":"大北窑西","value":"73"},{"source":"翠微路口","target":"郎家园","value":"151"},{"source":"翠微路口","target":"八王坟西","value":"3"},{"source":"老山南路东口","target":"日坛路","value":"13"},{"source":"老山南路东口","target":"永安里路口西","value":"5"},{"source":"老山南路东口","target":"大北窑西","value":"10"},{"source":"老山南路东口","target":"郎家园","value":"14"},{"source":"翠微路口","target":"四惠枢纽站","value":"57"},{"source":"老山南路东口","target":"八王坟西","value":"2"},{"source":"老山南路东口","target":"四惠枢纽站","value":"6"},{"source":"木樨地西","target":"工会大楼","value":"99"},{"source":"木樨地西","target":"复兴门内","value":"164"},{"source":"天安门东","target":"东单路口西","value":"134"},{"source":"木樨地西","target":"西单路口东","value":"120"},{"source":"天安门东","target":"北京站口东","value":"85"},{"source":"木樨地西","target":"天安门西","value":"67"},{"source":"木樨地西","target":"天安门东","value":"71"},{"source":"木樨地西","target":"东单路口西","value":"77"},{"source":"木樨地西","target":"北京站口东","value":"70"},{"source":"永安里路口西","target":"大北窑西","value":"108"},{"source":"永安里路口西","target":"郎家园","value":"203"},{"source":"永安里路口西","target":"八王坟西","value":"8"},{"source":"八王坟西","target":"四惠枢纽站","value":"15"},{"source":"永安里路口西","target":"四惠枢纽站","value":"59"},{"source":"天安门东","target":"日坛路","value":"73"},{"source":"天安门东","target":"永安里路口西","value":"100"},{"source":"天安门东","target":"大北窑西","value":"197"},{"source":"天安门东","target":"郎家园","value":"404"},{"source":"天安门东","target":"八王坟西","value":"17"},{"source":"木樨地西","target":"日坛路","value":"46"},{"source":"木樨地西","target":"永安里路口西","value":"43"},{"source":"木樨地西","target":"大北窑西","value":"40"},{"source":"天安门东","target":"四惠枢纽站","value":"168"},{"source":"木樨地西","target":"郎家园","value":"88"},{"source":"木樨地西","target":"八王坟西","value":"4"},{"source":"木樨地西","target":"四惠枢纽站","value":"25"}],"nodes":[{"name":"军事博物馆"},{"name":"工会大楼"},{"name":"八王坟西"},{"name":"复兴门内"},{"name":"老山南路东口"},{"name":"木樨地西"},{"name":"四惠枢纽站"},{"name":"西单路口东"},{"name":"大北窑西"},{"name":"郎家园"},{"name":"天安门西"},{"name":"老山公交场站"},{"name":"永安里路口西"},{"name":"五棵松桥西"},{"name":"东单路口西"},{"name":"公主坟"},{"name":"天安门东"},{"name":"北京站口东"},{"name":"日坛路"},{"name":"玉泉路口西"},{"name":"地铁八宝山站"},{"name":"翠微路口"}] };
+  display(100,30,data);
+</script>
+
+</body></html>
