@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>SANKEY Experiment</title>
+<style>
+
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+
+.link:hover {
+  stroke-opacity: .5;
+}
+
+</style>
+<body>
+
+<p id="chart">
+
+<script src="d3.v3.js"></script>
+<script src="sankey.js"></script>
+<script>
+
+var units = "Widgets";
+
+var margin = {top: 10, right: 10, bottom: 10, left: 10},
+    width = 1200 - margin.left - margin.right,
+    height = 740 - margin.top - margin.bottom;
+
+var formatNumber = d3.format(",.0f"),    // zero decimal places
+    format = function(d) { return formatNumber(d) + " " + units; },
+    color = d3.scale.category20();
+
+// append the svg canvas to the page
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Set the sankey diagram properties
+var sankey = d3.sankey()
+    .nodeWidth(36)
+    .nodePadding(10)
+    .size([width, height]);
+
+var path = sankey.link();
+
+// load the data
+//d3.json("sankey.json", function(error, graph)
+//{
+  var graph = {"links":[{"source":"果子巷","target":"广外关厢 ","value":"54"},{"source":"果子巷","target":"广外甘石桥 ","value":"48"},{"source":"果子巷","target":"六里桥东 ","value":"89"},{"source":"北京体育馆","target":"广外关厢 ","value":"43"},{"source":"北京体育馆","target":"广外甘石桥 ","value":"56"},{"source":"北京体育馆","target":"六里桥东 ","value":"64"},{"source":"广外甘石桥","target":"六里桥东 ","value":"88"},{"source":"广安门内","target":"广外关厢 ","value":"77"},{"source":"广安门内","target":"广外甘石桥 ","value":"49"},{"source":"广安门内","target":"六里桥东 ","value":"108"},{"source":"果子巷","target":"菜市口西 ","value":"42"},{"source":"天坛北门","target":"广外关厢 ","value":"32"},{"source":"天坛北门","target":"广外甘石桥 ","value":"30"},{"source":"果子巷","target":"广安门内 ","value":"80"},{"source":"天坛北门","target":"六里桥东 ","value":"35"},{"source":"天桥路口东","target":"永安路 ","value":"55"},{"source":"天桥路口东","target":"果子巷 ","value":"33"},{"source":"天桥路口东","target":"菜市口西 ","value":"47"},{"source":"天桥路口东","target":"广安门内 ","value":"59"},{"source":"法华寺","target":"天坛北门 ","value":"92"},{"source":"法华寺","target":"天桥路口东 ","value":"136"},{"source":"法华寺","target":"永安路 ","value":"194"},{"source":"法华寺","target":"果子巷 ","value":"57"},{"source":"法华寺","target":"菜市口西 ","value":"75"},{"source":"法华寺","target":"广安门内 ","value":"92"},{"source":"龙潭公园","target":"北京体育馆 ","value":"136"},{"source":"龙潭公园","target":"法华寺 ","value":"69"},{"source":"龙潭公园","target":"天坛北门 ","value":"68"},{"source":"龙潭公园","target":"天桥路口东 ","value":"41"},{"source":"龙潭公园","target":"永安路 ","value":"88"},{"source":"龙潭公园","target":"果子巷 ","value":"51"},{"source":"龙潭公园","target":"菜市口西 ","value":"49"},{"source":"龙潭公园","target":"广安门内 ","value":"70"},{"source":"永安路","target":"广外关厢 ","value":"80"},{"source":"永安路","target":"广外甘石桥 ","value":"113"},{"source":"永安路","target":"六里桥东 ","value":"159"},{"source":"龙潭公园","target":"广外关厢 ","value":"36"},{"source":"龙潭公园","target":"广外甘石桥 ","value":"33"},{"source":"龙潭公园","target":"六里桥东 ","value":"52"},{"source":"广外关厢","target":"广外甘石桥 ","value":"26"},{"source":"广外关厢","target":"六里桥东 ","value":"65"},{"source":"菜市口西","target":"广外关厢 ","value":"44"},{"source":"菜市口西","target":"广外甘石桥 ","value":"43"},{"source":"菜市口西","target":"六里桥东 ","value":"53"},{"source":"法华寺","target":"广外关厢 ","value":"45"},{"source":"法华寺","target":"广外甘石桥 ","value":"40"},{"source":"法华寺","target":"六里桥东 ","value":"77"},{"source":"菜市口西","target":"广安门内 ","value":"78"},{"source":"永安路","target":"果子巷 ","value":"73"},{"source":"永安路","target":"菜市口西 ","value":"116"},{"source":"永安路","target":"广安门内 ","value":"217"},{"source":"天坛北门","target":"天桥路口东 ","value":"71"},{"source":"天坛北门","target":"永安路 ","value":"120"},{"source":"天坛北门","target":"果子巷 ","value":"49"},{"source":"天坛北门","target":"菜市口西 ","value":"34"},{"source":"天桥路口东","target":"广外关厢 ","value":"39"},{"source":"天坛北门","target":"广安门内 ","value":"66"},{"source":"天桥路口东","target":"广外甘石桥 ","value":"29"},{"source":"天桥路口东","target":"六里桥东 ","value":"41"},{"source":"北京体育馆","target":"法华寺 ","value":"56"},{"source":"北京体育馆","target":"天坛北门 ","value":"39"},{"source":"北京体育馆","target":"天桥路口东 ","value":"40"},{"source":"北京体育馆","target":"永安路 ","value":"69"},{"source":"北京体育馆","target":"果子巷 ","value":"49"},{"source":"北京体育馆","target":"菜市口西 ","value":"65"},{"source":"北京体育馆","target":"广安门内 ","value":"122"}],"nodes":[{"name":"北京体育馆"},{"name":"北京体育馆 "},{"name":"六里桥东"},{"name":"六里桥东 "},{"name":"广外甘石桥"},{"name":"广外甘石桥 "},{"name":"龙潭公园"},{"name":"龙潭公园 "},{"name":"广外关厢"},{"name":"广外关厢 "},{"name":"菜市口西"},{"name":"菜市口西 "},{"name":"果子巷"},{"name":"果子巷 "},{"name":"法华寺"},{"name":"法华寺 "},{"name":"永安路"},{"name":"永安路 "},{"name":"天坛北门"},{"name":"天坛北门 "},{"name":"广安门内"},{"name":"广安门内 "},{"name":"天桥路口东"},{"name":"天桥路口东 "}]};
+    var nodeMap = {};
+    graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
+    graph.links = graph.links.map(function(x) {
+      return {
+        source: nodeMap[x.source],
+        target: nodeMap[x.target],
+        value: x.value
+      };
+    });
+
+  sankey
+      .nodes(graph.nodes)
+      .links(graph.links)
+      .layout(32);
+
+// add in the links
+  var link = svg.append("g").selectAll(".link")
+      .data(graph.links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .sort(function(a, b) { return b.dy - a.dy; });
+
+// add the link titles
+  link.append("title")
+        .text(function(d) {
+      	return d.source.name + " → " +
+                d.target.name + "\n" + format(d.value); });
+
+// add in the nodes
+  var node = svg.append("g").selectAll(".node")
+      .data(graph.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) {
+		  return "translate(" + d.x + "," + d.y + ")"; })
+    .call(d3.behavior.drag()
+      .origin(function(d) { return d; })
+      .on("dragstart", function() {
+		  this.parentNode.appendChild(this); })
+      .on("drag", dragmove));
+
+// add the rectangles for the nodes
+  node.append("rect")
+      .attr("height", function(d) { return d.dy; })
+      .attr("width", sankey.nodeWidth())
+      .style("fill", function(d) {
+		  return d.color = color(d.name.replace(/ .*/, "")); })
+      .style("stroke", function(d) {
+		  return d3.rgb(d.color).darker(2); })
+    .append("title")
+      .text(function(d) {
+		  return d.name + "\n" + format(d.value); });
+
+// add in the title for the nodes
+  node.append("text")
+      .attr("x", -6)
+      .attr("y", function(d) { return d.dy / 2; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d) { return d.name; })
+    .filter(function(d) { return d.x < width / 2; })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+
+// the function for moving the nodes
+  function dragmove(d) {
+    d3.select(this).attr("transform",
+        "translate(" + (
+        	   d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+        	) + "," + (
+                   d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+            ) + ")");
+    sankey.relayout();
+    link.attr("d", path);
+  }
+//}
+//);
+
+</script>
+
+</body>
+</html>

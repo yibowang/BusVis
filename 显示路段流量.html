@@ -1,0 +1,189 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#l-map{height:80%;width:100%;}
+		#r-result {width:100%;}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=inGwP7mGu57t6fPT0OVmBY35"></script>
+	<title>公交/地铁线路查询</title>
+</head>
+<body>
+	<div id="l-map"></div>
+</body>
+</html>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("l-map");            // 创建Map实例
+	map.centerAndZoom(new BMap.Point(116.404, 39.915), 12);
+	var myStyleJson=[
+		{
+					"featureType": "water",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "green",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "manmade",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "building",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+				{
+					"featureType": "poi",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "administrative",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "subway",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "railway",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "highway",
+					"elementType": "all",
+					"stylers": {
+										"color": "#ead1dc",
+										"visibility": "on"
+					}
+},
+{
+					"featureType": "arterial",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+}
+
+	]
+   map.setMapStyle({styleJson: myStyleJson });
+
+	function dis2(left,right){
+		return (left.lng - right.lng)*(left.lng - right.lng) + (left.lat - right.lat)*(left.lat - right.lat);
+	}
+	//findx point on AB nearest to x
+
+	function getNearest(A,B,x){
+		var cur = 0.0000001;
+		var left = {lng:A.lng,lat:A.lat};
+		var right = {lng:B.lng,lat:B.lat};
+		while(dis2(left,right)>cur){
+			var middle = {lng:(left.lng+right.lng)/2,lat:(left.lat+right.lat)/2};
+			var disleft = dis2(left,x);
+			var disright = dis2(right,x);
+			if(disleft<disright){
+				right.lng = middle.lng;
+				right.lat = middle.lat;
+			}else{
+				left.lng = middle.lng;
+				left.lat = middle.lat;
+			}
+		}
+		left.dis2 = dis2(left,x);
+		return left;
+	}
+	//找到离x最近的点所在的段,以及该点
+	function getMinSeg(path,x){
+		var res = {lng:0,lat:0};
+		var mindis2 = 1000000000;
+		for(var i = 0;i+1<path.length;i++){
+			var nearest = getNearest(path[i],path[i+1],x);
+			if(nearest.dis2<mindis2){
+				mindis2 = nearest.dis2;
+				res.lng = nearest.lng;
+				res.lat = nearest.lat;
+				res.ai = i;
+				res.bi = i+1;
+			}
+		}
+		return res;
+	}
+	//找到AB之间的点
+	function getSubPath(path,A,B){
+		var mA = getMinSeg(path,A);
+		var mB = getMinSeg(path,B);
+		var res = [];
+		res.push(mA);
+		for(var i = mA.bi;i<=mB.ai;i++){
+			res.push(path[i]);
+		}
+		res.push(mB);
+		return res;
+	}
+
+	function getCount(result,up,off){
+		var arr = [{up:"西单路口东",off:"天安门西",count:9623},{up:"天安门东",off:"天安门西",count:8757},{up:"工会大楼",off:"木樨地西",count:7026},{up:"天安门东",off:"东单路口西",count:9245},{up:"工会大楼",off:"复兴门内",count:8883},{up:"公主坟",off:"翠微路口",count:5227},{up:"公主坟",off:"军事博物馆",count:7396},{up:"木樨地西",off:"军事博物馆",count:6579},{up:"木樨地西",off:"工会大楼",count:8353},{up:"翠微路口",off:"公主坟",count:7114},{up:"军事博物馆",off:"公主坟",count:6019},{up:"军事博物馆",off:"木樨地西",count:7893},{up:"大北窑东",off:"大北窑西",count:10755},{up:"老山南路东口",off:"老山公交场站",count:70},{up:"老山南路东口",off:"地铁八宝山站",count:848},{up:"玉泉路口西",off:"地铁八宝山站",count:1222},{up:"大北窑西",off:"永安里路口西",count:10912},{up:"大北窑西",off:"郎家园",count:7071},{up:"老山公交场站",off:"老山南路东口",count:366},{up:"八王坟西",off:"大北窑东",count:5916},{up:"地铁八宝山站",off:"老山南路东口",count:286},{up:"北京站口东",off:"东单路口西",count:9859},{up:"地铁八宝山站",off:"玉泉路口西",count:2484},{up:"北京站口东",off:"日坛路",count:9015},{up:"永安里路口西",off:"日坛路",count:10888},{up:"天安门西",off:"西单路口东",count:8685},{up:"永安里路口西",off:"大北窑西",count:8400},{up:"天安门西",off:"天安门东",count:9376},{up:"东单路口西",off:"天安门东",count:9096},{up:"东单路口西",off:"北京站口东",count:9452},{up:"南礼士路",off:"工会大楼",count:7182},{up:"日坛路",off:"北京站口东",count:10672},{up:"日坛路",off:"永安里路口西",count:8902}];
+		var upstr = result.getBusStation(up).name;
+		var offstr= result.getBusStation(off).name;
+		for(var i = 0;i<arr.length;i++){
+			if(arr[i].up==upstr&&arr[i].off==offstr)
+				return arr[i].count;
+		}
+		return 0;
+	}
+	var busline = new BMap.BusLineSearch(map,{
+		onGetBusListComplete: function(result){
+		   if(result) {
+			 var fstLine = result.getBusListItem(0);//获取第一个公交列表显示到map上
+			 busline.getBusLine(fstLine);
+		   }
+		},
+		onGetBusLineComplete:function(result){
+        		var path = result.getPath();
+
+						for(var i = 0;i+1<result.getNumBusStations();i++){
+							var A = result.getBusStation(i).position;
+							var B = result.getBusStation(i+1).position;
+							var subPath = getSubPath(path,A,B);
+							var count = getCount(result,i,i+1);
+							console.log(" "+i+" "+(i+1)+" : "+count);
+							var polyline = new BMap.Polyline(subPath,{strokeWeight:count/1000});
+							map.addOverlay(polyline);
+							map.setViewport(subPath); // 自动适应屏幕大小
+						}
+		}
+	});
+	function busSearch(){
+		var busName = 1;
+		busline.getBusList(busName);
+	}
+	setTimeout(function(){
+		busSearch();
+	},1500);
+</script>
