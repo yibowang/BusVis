@@ -22,42 +22,28 @@
 <script type="text/javascript">
 	var MAXF = 60;
 		function color(i){
-			/*var a=[
-				"#e7e7e7",
-				"#35c7f0",
-				"#2f8ce1",
-				"#2952d2",
-				"#202bc5",
-				"#532fd1",
-				"#8d34de",
-				"#c73dea",
-				"#f739c1",
-				"#ea2787",
-				"#db144f",
-				];
-				*/
-				var a=[
-					"#e7e7e7",
-					"#33dd00",
-					"#44bb00",
-					"#55aa00",
-					"#669900",
-					"#778800",
-					"#887700",
-					"#996600",
-					"#aa5500",
-					"#bb4400",
-					"#dd3300",
-					"#dd3300"
-					];
-			var v = Math.floor(i*220/MAXF);
-			if (v>220)v = 220;
-			if(v==0)return"#e7e7e7";
-			return "#"+c2s(v)+c2s(255-v)+"00";
+			var step=[
+				{r:0xe7,g:0xe7,b:0xe7}//gray
+				,{r:0,g:0xff,b:0}//"#00ff00"//green
+				,{r:0xff,g:0xff,b:0}//"#ffff00"//yellow
+				,{r:0xff,g:0,b:0}//"#ff0000"//red
+			];
+			var cc = MAXF/step.length;
+			var ci = Math.floor(i/cc);
+			if(ci>= step.length - 1)
+				ci = step.length - 2;
+			var rate = (i - ci * cc) / cc;
+			if(rate>1)rate = 1;
+			var r,g,b;
+			r = step[ci].r + (step[ci+1].r - step[ci].r)*rate;
+			g = step[ci].g + (step[ci+1].g - step[ci].g)*rate;
+			b = step[ci].b + (step[ci+1].b - step[ci].b)*rate;
+			return "#"+c2s(r)+c2s(g)+c2s(b);
 		}
 		function c2s(v){
+			if(v>255)v=255;
 			var trans=['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
-			return trans[Math.floor(v/16)]+trans[v%16];
+			return trans[Math.floor(v/16)]+trans[Math.floor(v)%16];
 		}
 		function draw(x,y,w,h,data){
 			var html="";
