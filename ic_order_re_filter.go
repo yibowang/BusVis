@@ -96,12 +96,12 @@ func orderUp(file string){
 		preSort(linelist,i,j)
 		i = j
 	}
-	//li := [][]string{}
+	li := [][]string{}
 	for i:=0;i<len(linelist); {
 		j := flagSame(linelist,i)
 		if j-i > FILTER {
 			for k:=i;k<j;k++{w.WriteString(vec2str(linelist[k]))}
-			//li = append(li,linelist[i:j]...)
+			li = append(li,linelist[i:j]...)
 		}else{
 			fmt.Printf("%d-%d is desprated\n",i,j)
 		}
@@ -149,7 +149,7 @@ func preSort(linelist [][]string,i int,j int){
 }
 
 //
-const FILTER = 4
+const FILTER = 1
 
 //get max string whose flag is the same
 func flagSame(linelist [][]string,i int) int{

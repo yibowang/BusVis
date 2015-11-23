@@ -75,7 +75,7 @@ func orderUp(file string){
 	}
 	defer ifile.Close()
 	r := bufio.NewReader(ifile)
-	ofile,err := os.Create(file+"_filter4")
+	ofile,err := os.Create(file+"_graph")
 	if err != nil {
 		panic(err)
 	}
@@ -98,57 +98,57 @@ func orderUp(file string){
 		preSort(linelist,i,j)
 		i = j
 	}
-	li := [][]string{}
+	//li := [][]string{}
 	for i:=0;i<len(linelist); {
 		j := flagSame(linelist,i)
 		if j-i > FILTER {
 			//for k:=i;k<j;k++{w.WriteString(vec2str(linelist[k]))}
-			li = append(li,linelist[i:j]...)
-		}else{
-			//fmt.Printf("%d-%d is desprated\n",i,j)
-		}
-		i = j
-	}
-	//zip
-	li2 := []int{}
-	for i,v := range li{
-		if i==0 || v[5] != li[i-1][5]{
-			li2 = append(li2,i)
-			//fmt.Printf("%d %d %s\n",len(li2),i,v[5])
-		}
-	}
-	/*
-	for _,v := range li2{
-		w.WriteString(vec2str(li[v]))
-	}
-	*/
-	lengthmap := make(map[int]int)
-	for i:=0;i<len(li2);{
-		j := changeSame(li2,li,i)
-		if j-i > FILTER2 {
-			for k:=i;k<j;k++{
-				for m:= li2[k];m<len(li);m++{
-					if k+1<len(li2) && m>=li2[k+1]{break}
-					w.WriteString(vec2str(li[m]))
-				}
-				
-			}
+			//li = append(li,linelist[i:j]...)
+			w.WriteString(genJson(linelist[i:j]))
+			w.WriteString(",")
 		}else{
 			fmt.Printf("%d-%d is desprated\n",i,j)
 		}
-		_,f := lengthmap[j-i]
-		if !f {
-			lengthmap[j-i] = 1
-		}else {
-			lengthmap[j-i] += 1
-		}
 		i = j
 	}
-	for i,v := range lengthmap{
-		fmt.Println(i," count: ",v)
-	}
+	/*
+	for i:=0;i<len(li);i++{
+		j := changeSame(li,i)
+		if j-i > FILTER {
+			for k:=i;k<j;k++{w.WriteString(vec2str(li[k]))}
+		}else{
+			fmt.Printf("%d-%d is desprated\n",i,j)
+		}
+		i = j
+	}*/
 }
 
+
+func genJson(linelist [][]string)string{
+	buf := bytes.NewBufferString("")
+	mmap := make(map[string]int)
+	for _,line := range linelist{
+		_,find := mmap[line[5]]
+		if !find {mmap[line[5]] = 1}else {mmap[line[5]]+=1}
+		_,find = mmap[line[6]]
+		if !find {mmap[line[6]] = 1}else {mmap[line[6]]+=1}
+	}
+	buf.WriteString("{")
+	buf.WriteString(fmt.Sprintf("beginT:\"%s\"",linelist[0][4]))
+	var j5,j6 int
+	fmt.Sscanf(linelist[0][5],"%d",&j5)
+	fmt.Sscanf(linelist[0][6],"%d",&j6)
+	if j5<j6 {buf.WriteString(",flag:\"bigger\"")}else {buf.WriteString(",flage:\"smaller\"")}
+	buf.WriteString(",data:{")
+	count := 0
+	for k,v := range mmap{
+		if count >0{buf.WriteString(",")}
+		buf.WriteString(fmt.Sprintf("\"%s\":%d",k,v))
+		count += 1
+	}
+	buf.WriteString("}}")
+	return buf.String()
+}
 
 
 type ByUpCB [][]string
@@ -179,8 +179,8 @@ func preSort(linelist [][]string,i int,j int){
 }
 
 //
-const FILTER = 4
-const FILTER2 = 2
+const FILTER = 1
+
 //get max string whose flag is the same
 func flagSame(linelist [][]string,i int) int{
 	var i5,i6 int
@@ -190,6 +190,9 @@ func flagSame(linelist [][]string,i int) int{
 		var j5,j6 int
 		fmt.Sscanf(linelist[j][5],"%d",&j5)
 		fmt.Sscanf(linelist[j][6],"%d",&j6)
+		if linelist[j][8] != linelist[i][8]{
+			return j
+		}
 		if (j5 < j6) != (i5 < i6) {
 			return j
 		}
@@ -198,13 +201,13 @@ func flagSame(linelist [][]string,i int) int{
 }
 
 //get max string whose change flag  is the same
-func changeSame(li2 []int,linelist [][]string,i int)int{
+func changeSame(linelist [][]string,i int)int{
 	var f int
 	fp := 0
-	for j:= i;j<len(li2);j++{
+	for j:= i;j<len(linelist);j++{
 		var i5,j5 int
-		if j>0 {fmt.Sscanf(linelist[li2[j-1]][5],"%d",&i5)}
-		fmt.Sscanf(linelist[li2[j]][5],"%d",&j5)
+		if j>0 {fmt.Sscanf(linelist[j-1][5],"%d",i5)}
+		fmt.Sscanf(linelist[j][5],"%d",j5)
 		if j==0 || j5 == i5 {
 			f = 0
 		}else if i5 < j5 {
@@ -215,7 +218,7 @@ func changeSame(li2 []int,linelist [][]string,i int)int{
 		if (fp != 0) && (f != 0)&&(fp != f) {return j}
 		if f != 0 {fp = f}
 	}
-	return len(li2)
+	return len(linelist)
 }
 
 func main(){
