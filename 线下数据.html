@@ -1,0 +1,363 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#l-map{height:80%;width:100%;}
+		#r-result {width:100%;}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=inGwP7mGu57t6fPT0OVmBY35"></script>
+	<title>公交/地铁线路查询</title>
+</head>
+<body>
+	<div id="l-map"></div>
+</body>
+</html>
+<script type="text/javascript" src="all_jijia.js"></script>
+<script type="text/javascript" src="baidudata.js"></script>
+<script type="text/javascript" src="jquery.js"></script>
+
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("l-map");            // 创建Map实例
+	map.centerAndZoom(new BMap.Point(116.404, 39.915), 12);
+	var myStyleJson=[
+		{
+					"featureType": "water",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "green",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "manmade",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "building",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+				{
+					"featureType": "poi",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "administrative",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "subway",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "railway",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+},
+{
+					"featureType": "highway",
+					"elementType": "all",
+					"stylers": {
+										"color": "#ead1dc",
+										"visibility": "on"
+					}
+},
+{
+					"featureType": "arterial",
+					"elementType": "all",
+					"stylers": {
+										"visibility": "off"
+					}
+}
+
+	]
+   map.setMapStyle({styleJson: myStyleJson });
+
+	function dis2(left,right){
+		return (left.lng - right.lng)*(left.lng - right.lng) + (left.lat - right.lat)*(left.lat - right.lat);
+	}
+	//findx point on AB nearest to x
+
+	function getNearest(A,B,x){
+		var cur = 0.0000001;
+		var left = {lng:A.lng,lat:A.lat};
+		var right = {lng:B.lng,lat:B.lat};
+		while(dis2(left,right)>cur){
+			var middle = {lng:(left.lng+right.lng)/2,lat:(left.lat+right.lat)/2};
+			var disleft = dis2(left,x);
+			var disright = dis2(right,x);
+			if(disleft<disright){
+				right.lng = middle.lng;
+				right.lat = middle.lat;
+			}else{
+				left.lng = middle.lng;
+				left.lat = middle.lat;
+			}
+		}
+		left.dis2 = dis2(left,x);
+		return left;
+	}
+	//找到离x最近的点所在的段,以及该点
+	function getMinSeg(path,x){
+		var res = {lng:0,lat:0};
+		var mindis2 = 1000000000;
+		for(var i = 0;i+1<path.length;i++){
+			var nearest = getNearest(path[i],path[i+1],x);
+			if(nearest.dis2<mindis2){
+				mindis2 = nearest.dis2;
+				res.lng = nearest.lng;
+				res.lat = nearest.lat;
+				res.ai = i;
+				res.bi = i+1;
+			}
+		}
+		return res;
+	}
+	//找到AB之间的点
+	function getSubPath(path,A,B){
+		var mA = getMinSeg(path,A);
+		var mB = getMinSeg(path,B);
+		var res = [];
+		res.push(mA);
+		for(var i = mA.bi;i<=mB.ai;i++){
+			res.push(path[i]);
+		}
+		res.push(mB);
+		return res;
+	}
+
+	function getCount(result,up,off){
+		var arr = [{up:"西单路口东",off:"天安门西",count:9623},{up:"天安门东",off:"天安门西",count:8757},{up:"工会大楼",off:"木樨地西",count:7026},{up:"天安门东",off:"东单路口西",count:9245},{up:"工会大楼",off:"复兴门内",count:8883},{up:"公主坟",off:"翠微路口",count:5227},{up:"公主坟",off:"军事博物馆",count:7396},{up:"木樨地西",off:"军事博物馆",count:6579},{up:"木樨地西",off:"工会大楼",count:8353},{up:"翠微路口",off:"公主坟",count:7114},{up:"军事博物馆",off:"公主坟",count:6019},{up:"军事博物馆",off:"木樨地西",count:7893},{up:"大北窑东",off:"大北窑西",count:10755},{up:"老山南路东口",off:"老山公交场站",count:70},{up:"老山南路东口",off:"地铁八宝山站",count:848},{up:"玉泉路口西",off:"地铁八宝山站",count:1222},{up:"大北窑西",off:"永安里路口西",count:10912},{up:"大北窑西",off:"郎家园",count:7071},{up:"老山公交场站",off:"老山南路东口",count:366},{up:"八王坟西",off:"大北窑东",count:5916},{up:"地铁八宝山站",off:"老山南路东口",count:286},{up:"北京站口东",off:"东单路口西",count:9859},{up:"地铁八宝山站",off:"玉泉路口西",count:2484},{up:"北京站口东",off:"日坛路",count:9015},{up:"永安里路口西",off:"日坛路",count:10888},{up:"天安门西",off:"西单路口东",count:8685},{up:"永安里路口西",off:"大北窑西",count:8400},{up:"天安门西",off:"天安门东",count:9376},{up:"东单路口西",off:"天安门东",count:9096},{up:"东单路口西",off:"北京站口东",count:9452},{up:"南礼士路",off:"工会大楼",count:7182},{up:"日坛路",off:"北京站口东",count:10672},{up:"日坛路",off:"永安里路口西",count:8902}];
+		var upstr = result.getBusStation(up).name;
+		var offstr= result.getBusStation(off).name;
+		for(var i = 0;i<arr.length;i++){
+			if(arr[i].up==upstr&&arr[i].off==offstr)
+				return arr[i].count;
+		}
+		return 0;
+	}
+
+	var BSRATE = 10000;
+	function bigger(v){
+		return Math.floor(v*BSRATE);
+	}
+	function smaller(v){
+		return v/BSRATE;
+	}
+		var MAXF = 5000;
+		function color(i){
+			var step=[
+				{r:0xe7,g:0xe7,b:0xe7}//gray
+				,{r:0,g:0xff,b:0}//"#00ff00"//green
+				,{r:0xff,g:0xff,b:0}//"#ffff00"//yellow
+				,{r:0xff,g:0,b:0}//"#ff0000"//red
+			];
+			var cc = MAXF/step.length;
+			var ci = Math.floor(i/cc);
+			if(ci>= step.length - 1)
+				ci = step.length - 2;
+			var rate = (i - ci * cc) / cc;
+			if(rate>1)rate = 1;
+			var r,g,b;
+			r = step[ci].r + (step[ci+1].r - step[ci].r)*rate;
+			g = step[ci].g + (step[ci+1].g - step[ci].g)*rate;
+			b = step[ci].b + (step[ci+1].b - step[ci].b)*rate;
+			return "#"+c2s(r)+c2s(g)+c2s(b);
+		}
+		function opacity(v){
+			var o =  v/MAXF;
+			if(o>=1)o=1;
+			if(o<0.2)o=0.3;
+			return o;
+		}
+		function c2s(v){
+			if(v>255)v=255;
+			var trans=['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
+			return trans[Math.floor(v/16)]+trans[Math.floor(v)%16];
+		}
+
+
+	var finishedOne = true;
+	var datai = [];
+	for(var j in flowDataMap){
+		datai.push(j);
+	}
+	function showall(i){
+		var next = i;
+		if(i<datai.length){
+			if(finishedOne){
+				//finishedOne = false;
+				next = i+1;
+				//busSearch(datai[i]);
+			}
+			setTimeout(function(){
+				showall(next)
+			},100);
+		}
+	}
+	var namemap=[];
+	for(var j in baidudata){
+		namemap.push(j);
+	}
+	function showline(no){
+		var  name = namemap[no];
+		var points=[];
+		var path = baidudata[name].path;
+		for( var j in path){
+			var point = new BMap.Point(path[j].lng,path[j].lat);
+			points.push(point);
+		}
+		var polyline = new BMap.Polyline(points,{strokeWeight:1,strokeColor:"#ff0000"});
+		map.addOverlay(polyline);
+		var station = baidudata[name].station;
+		for(var j in station){
+			var marker = new BMap.Marker(new BMap.Point(station[j].position.lng,station[j].position.lat)); // 创建点
+			map.addOverlay(marker);
+		}
+	}
+	function baiduBigger(){
+		for(var k in baidudata){
+			var path = baidudata[k].path;
+			var stations = baidudata[k].station;
+			for(var i = 0;i<path.length;i++){
+				path[i].lng = smaller(bigger(path[i].lng));
+				path[i].lat = smaller(bigger(path[i].lat));
+			}
+		}
+	}
+	baiduBigger();
+	function showOneLine(busName,back){
+		var flowlinks=flowDataMap[busName].data1;
+		var stations = baidudata[flowDataMap[busName].data1name].station;
+		var path = baidudata[flowDataMap[busName].data1name].path;
+		console.log(flowDataMap[busName].data1name);
+		if(!back){
+				flowlinks=flowDataMap[busName].data2;
+				stations = baidudata[flowDataMap[busName].data2name].station;
+				path = baidudata[flowDataMap[busName].data2name].path;
+				console.log(flowDataMap[busName].data2name);
+		}
+		var pathmap=[];
+		for(var j = 0;j<stations.length;j++){
+			pathmap[stations[j].name] = j;
+		}
+		console.log(stations);
+		var countFlow=[];
+		for(var i = 0;i<flowlinks.length;i++){
+			var linkstr = flowlinks[i].link;
+			var count = flowlinks[i].count;
+			var p2 = linkstr.split(" ");
+			var source = p2[0];
+			var target = p2[1];
+			var si = pathmap[source];
+			if(nodef(si)){
+				console.log(source+" not found")
+				continue;
+			}
+			var ti = pathmap[target];
+			if(nodef(ti)){
+				console.log(target+" not found")
+				continue;
+			}
+			if(si>ti){
+				console.log("NOT OK");
+			}else{
+				for(var k = si;k<ti;k++){
+					map1insert(countFlow,k,count);
+				}
+			}
+		}
+		console.log("step2 begin");
+		for(var i = 0;i+1<stations.length;i++){
+			var A = stations[i].position;
+			var B = stations[i+1].position;
+			var subpath = getSubPath(path,A,B);
+			for(var j = 0;j + 1<subpath.length;j++){
+				var cccc = map1read(countFlow,i);
+				map4insert(miniPointCount,subpath[j].lng,subpath[j].lat,subpath[j+1].lng,subpath[j+1].lat,cccc);
+			}
+		}
+		for(var i = 0;i+1<path.length;i++){
+			var count = map4read(miniPointCount,path[i].lng,path[i].lat,path[i+1].lng,path[i+1].lat);
+			var p1 = new BMap.Point(path[i].lng,path[i].lat);
+			var p2 = new BMap.Point(path[i+1].lng,path[i+1].lat);
+			var polyline = new BMap.Polyline([p1,p2],{strokeWeight:3,strokeOpacity:opacity(count),strokeColor:(color(count))});
+			map.addOverlay(polyline);
+		}
+	}
+	var miniPointCount = [];
+	function nodef(v){
+		return (typeof(v)=="undefined");
+	}
+	function map1insert(m,i,v){
+		if(nodef(m[i]))
+			m[i] = v;
+		else m[i] += v;
+	}
+	function map1read(m,i){
+		if(nodef(m[i]))
+			return 0;
+		return m[i];
+	}
+	function map2insert(m,i,j,v){
+		if(nodef(m[i]))
+			m[i]=[];
+		if(nodef(m[i][j]))
+			m[i][j] = 0;
+		m[i][j] += v;
+	}
+	function map2read(m,i,j){
+		if(nodef(m[i]))
+			return 0;
+		if(nodef(m[i][j]))
+			return 0;
+		return m[i][j];
+	}
+	function map4insert(m,i,j,x,y,v){
+		if(nodef(m[i]))
+			m[i]=[];
+		if(nodef(m[i][j]))
+			m[i][j] = [];
+		if(nodef(m[i][j][x]))
+			m[i][j][x] = [];
+		if(nodef(m[i][j][x][y]))
+			m[i][j][x][y] = 0;
+		m[i][j][x][y] += v;
+	}
+	function map4read(m,i,j,x,y){
+		if(nodef(m[i]))
+			return 0;
+		if(nodef(m[i][j]))
+			return 0;
+		if(nodef(m[i][j][x]))
+			return 0;
+		if(nodef(m[i][j][x][y]))
+			return 0;
+		return m[i][j][x][y];
+	}
+</script>
