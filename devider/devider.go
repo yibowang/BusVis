@@ -21,7 +21,7 @@ func devide(file io.Reader,date string){
 	for {
 		line := readline.ReadLine(file)
 		if len(line)==0 {
-			return
+			break
 		}
 		if strings.HasPrefix(line[3],date)&& strings.HasPrefix(line[4],date) {
 			fb,find := filemap[line[7]]

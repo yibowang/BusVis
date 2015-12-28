@@ -29,18 +29,15 @@ type UD struct {
 }
 
 
-func deal(file string){
+func deal(file string,w io.Writer){
         ifile,err := os.Open(file)
         if err != nil{
                 panic(err)
         }
         defer ifile.Close()
         r := bufio.NewReader(ifile)
-	countstationb := make(map[string]map[int]UD)
-	countstations := make(map[string]map[int]UD)
+	countstation := make(map[string]map[int]UD)
 	isfirst := true
-	isbigger := true
-	countstation := countstationb 
         for {
                 line := readline.ReadLine(r)
 		if len(line)==0 {
@@ -66,21 +63,12 @@ func deal(file string){
                 down := line[6]
 		fmt.Sscanf(up,"%d",&upno)
 		fmt.Sscanf(down,"%d",&downno)
-		if upno != downno{
-			isbigger = (upno<downno)
-			if isbigger{
-				countstation = countstationb	
-			}else{
-				countstation = countstations
-			}
-		}
-		wup,_ := converter.GetStation(lineid,up,isbigger)
-		wdown,_ := converter.GetStation(lineid,down,isbigger)
+		wup,_ := converter.GetStation(lineid,up,upno<downno)
+		wdown,_ := converter.GetStation(lineid,down,upno<downno)
                 insertMap(countstation,wup,upt,true)
                 insertMap(countstation,wdown,downt,false)
 	}
-	genJson2(countstationb,true)
-	genJson2(countstations,false)
+	genJson2(countstation,w)
 }
 
 func insertMap(m map[string]map[int]UD,s string,st int,isup bool){
@@ -104,25 +92,11 @@ func insertMap(m map[string]map[int]UD,s string,st int,isup bool){
 ]
 
 */
-func genJson2(count map[string]map[int]UD,isbigger bool){
+func genJson2(count map[string]map[int]UD,w io.Writer){
 	if converter == nil{return}
-
-	flag := "+"
-	if !isbigger{flag = "-"}
-	ofile,err := os.Create(fmt.Sprintf("%d%s.json",lineid,flag))
-        if err != nil {
-                panic(err)
-        }
-        w := bufio.NewWriter(ofile)
-        defer func(){
-                w.Flush()
-                ofile.Close()
-        }()
-
-	linename := converter.GetLineName(lineid,isbigger)
-        io.WriteString(w,fmt.Sprintf("{linename:\"%s\",data:[",linename))
+        io.WriteString(w,fmt.Sprintf(",\"%d\":[",lineid))
         ccc := 0
-	stations := converter.GetSortStation(lineid,isbigger)
+	stations := converter.GetSortStation(lineid)
 	for _,j := range stations{
                 if ccc>0{io.WriteString(w,",")}
 		c := count[j]
@@ -134,21 +108,32 @@ func genJson2(count map[string]map[int]UD,isbigger bool){
                 io.WriteString(w,"}")
                 ccc += 1
         }
-        io.WriteString(w,"]}")
+        io.WriteString(w,"]")
 }
 
 func main(){
-	if len(os.Args) < 3{
-		fmt.Println("format: pixel stationfile  ic1.csv ic2.csv ...")
+	if len(os.Args) < 4{
+		fmt.Println("format: pixel stationfile outfile.js  ic1.csv ic2.csv ...")
 		return
 	}
 	converter = jijia2wuli.NewConverter(os.Args[1])
+        ofile,err := os.Create(os.Args[2])
+        if err != nil {
+                panic(err)
+        }
+        w := bufio.NewWriter(ofile)
+        defer func(){
+                w.Flush()
+                ofile.Close()
+        }()
+	io.WriteString(w,"var datas={0:{}")
         for i,name := range os.Args{
-                if i > 1 {
+                if i > 2 {
                         fmt.Println("deal "+name)
-                        deal(name)
+                        deal(name,w)
                 }
         }
+	io.WriteString(w,"};")
 }
 
 
