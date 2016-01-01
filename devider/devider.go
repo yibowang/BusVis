@@ -51,8 +51,9 @@ func devide(file io.Reader,date string){
 		}
 	}
 	defer func(){
-		for _,f := range filemap {
+		for k,f := range filemap {
 			f.writer.Flush()
+			fmt.Println(k,"Closed")
 			f.file.Close()
 		}
 	}()

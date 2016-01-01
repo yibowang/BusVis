@@ -86,17 +86,30 @@ func deal(file string){
 		sortList = append(sortList,b2)
 	}
 	
+	fb := NewFile(true)
+	fs := NewFile(false)
+
+	fb.WriteString("data:[")
+	fs.WriteString("data:[")
+
+	
 
 	sort.Sort(ByBusTimeSta(sortList))
 	aline := []BTS{}
+	ccc := 0
 	for i,b := range sortList{
 		aline = append(aline,b)
 		//a line end
 		if i + 1 == len(sortList) || b.busid != sortList[i+1].busid{
-			dealaline(aline)
+			dealaline(aline,fb,fs,b.busid,ccc)
 			aline = []BTS{}
+			ccc ++
 		}
 	}
+	fb.WriteString("]}")
+	fs.WriteString("]}")
+	fb.Close()
+	fs.Close()
 }
 type file struct{
 	file * os.File
@@ -113,13 +126,15 @@ type file struct{
 		{
 			busid:43223,
 			data:{
-				"1":[
+				{data:[
 					{station:12,time:4324}
 					...
-				],
-				"2":[],
+				]},
+				{data:[]},
 				...
 			}
+		},
+		...
 	]
 */
 func NewFile(isbigger bool)*file{
@@ -135,7 +150,7 @@ func NewFile(isbigger bool)*file{
 	io.WriteString(w,"station:[")
 	ccc := 0
 	for _,sta := range stas{
-		if ccc == 0{
+		if ccc > 0{
 			io.WriteString(w,",")
 		}
 		io.WriteString(w,fmt.Sprintf("{no:%d,jno:%d,name:\"%s\"}",sta.No(),sta.Jno(),sta.Name()))
@@ -147,6 +162,10 @@ func NewFile(isbigger bool)*file{
 		w:w,
 	}
 }
+func (f *file)WriteString(s string){
+	io.WriteString(f.w,s)
+}
+
 func (f *file)Close(){
 	f.w.Flush()
 	f.file.Close()
@@ -155,19 +174,36 @@ func (f *file)Close(){
 const MINSIZE  = 3
 
 //deal a bus
-func dealaline(l []BTS){
+func dealaline(l []BTS,fb *file,fs *file,busid int,ccc int){
 	once := []BTS{}
 	fmt.Println("Bus Begin")
+	if ccc > 0{
+		fb.WriteString(",")
+		fs.WriteString(",")
+	}
+	fb.WriteString(fmt.Sprintf("{busid:%d,data:[",busid))
+	fs.WriteString(fmt.Sprintf("{busid:%d,data:[",busid))
+	ccc1 := 0
+	ccc2 := 0
 	for i,c := range l{
 		once = append(once,c)
 		if i + 1 == len(l) || c.isbigger != l[i+1].isbigger{
 			if countonce(once)>MINSIZE{
 				//newl = append(newl,once...)
-				dealonce(once)
+				if c.isbigger{
+					dealonce(once,fb,ccc1)
+					ccc1 ++
+				}else{
+					dealonce(once,fs,ccc2)
+					ccc2 ++
+				}
 			}
 			once = []BTS{}
 		}
 	}
+	
+	fb.WriteString("]}")
+	fs.WriteString("]}")
 	fmt.Println("Bus End")
 }
 func countonce(o []BTS)int{
@@ -178,39 +214,29 @@ func countonce(o []BTS)int{
 	return len(cmap)
 }
 //deal once from begin to end
-func dealonce(o []BTS){
+func dealonce(o []BTS,f *file,ccc int){
 	fmt.Println("  Once Begin")
-	cmap := make(map[int][]int)
 	fmt.Println("[")
+	if ccc >0 {
+		f.WriteString(",")
+	}
+	f.WriteString("{data:[")
 	isfirst := true
 	for _,b := range o{
 		if isfirst{
 			isfirst = false
 		}else{
 			fmt.Println(",")
+			f.WriteString(",")
 		}
 		fmt.Printf("{station:%d,time:%d}",b.station,b.time)
+		f.WriteString(fmt.Sprintf("{station:%d,time:%d}",b.station,b.time))
+		
 		//t := b.time
 		//fmt.Printf("      %d %d %d:%02d:%02d\n",b.busid,b.station,t/3600,t/60%60,t%60)
 	}
-	fmt.Println("]")
-	return
-	for _,b := range o{
-		c,find := cmap[b.station]
-		if !find {
-			c = []int{}
-		}
-		c = append(c,b.time)
-		cmap[b.station] = c
-	}
-	for s,v := range cmap{
-		fmt.Printf("    [%d]:\n",s)
-		sort.Sort(ByTime(v))
-		for _,t := range v{
-			fmt.Printf("      %d:%02d:%02d\n",t/3600,t/60%60,t%60)
-		}
-	}
-	fmt.Println("  Once End")
+	fmt.Println("]}")
+	f.WriteString("]}")
 }
 
 type BTS struct{
