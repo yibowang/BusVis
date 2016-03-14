@@ -18,7 +18,6 @@ func devide(file io.Reader,date string){
 	filemap := make(map[string] FileBuff)
 	
 	countline := 0
-	var check int
 	for {
 		line := readline.ReadLine(file)
 		if len(line)==0 {
@@ -26,8 +25,6 @@ func devide(file io.Reader,date string){
 		}
 		countline++
 		fmt.Printf("%d\r",countline)
-		fmt.Sscanf(line[9],"%d",&check)
-		if check != 1{continue}
 		if strings.HasPrefix(line[3],date)&& strings.HasPrefix(line[4],date) {
 			fb,find := filemap[line[7]]
 			if !find {
@@ -37,7 +34,7 @@ func devide(file io.Reader,date string){
 					panic(err)
 				}
 				fb =  FileBuff{file:ofile,writer:writer}
-				filemap[line[7]] = fb 
+				filemap[line[7]] = fb
 			}
 			for i,v := range line {
 				if i != 0 {
@@ -51,9 +48,8 @@ func devide(file io.Reader,date string){
 		}
 	}
 	defer func(){
-		for k,f := range filemap {
+		for _,f := range filemap {
 			f.writer.Flush()
-			fmt.Println(k,"Closed")
 			f.file.Close()
 		}
 	}()

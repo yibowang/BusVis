@@ -176,7 +176,7 @@ const MINSIZE  = 3
 //deal a bus
 func dealaline(l []BTS,fb *file,fs *file,busid int,ccc int){
 	once := []BTS{}
-	fmt.Println("Bus Begin")
+	//fmt.Println("Bus Begin")
 	if ccc > 0{
 		fb.WriteString(",")
 		fs.WriteString(",")
@@ -204,7 +204,7 @@ func dealaline(l []BTS,fb *file,fs *file,busid int,ccc int){
 	
 	fb.WriteString("]}")
 	fs.WriteString("]}")
-	fmt.Println("Bus End")
+	//fmt.Println("Bus End")
 }
 func countonce(o []BTS)int{
 	cmap := make(map[int]bool)
@@ -215,8 +215,8 @@ func countonce(o []BTS)int{
 }
 //deal once from begin to end
 func dealonce(o []BTS,f *file,ccc int){
-	fmt.Println("  Once Begin")
-	fmt.Println("[")
+	//fmt.Println("  Once Begin")
+	//fmt.Println("[")
 	if ccc >0 {
 		f.WriteString(",")
 	}
@@ -226,16 +226,16 @@ func dealonce(o []BTS,f *file,ccc int){
 		if isfirst{
 			isfirst = false
 		}else{
-			fmt.Println(",")
+			//fmt.Println(",")
 			f.WriteString(",")
 		}
-		fmt.Printf("{station:%d,time:%d}",b.station,b.time)
+		//fmt.Printf("{station:%d,time:%d}",b.station,b.time)
 		f.WriteString(fmt.Sprintf("{station:%d,time:%d}",b.station,b.time))
 		
 		//t := b.time
 		//fmt.Printf("      %d %d %d:%02d:%02d\n",b.busid,b.station,t/3600,t/60%60,t%60)
 	}
-	fmt.Println("]}")
+	//fmt.Println("]}")
 	f.WriteString("]}")
 }
 

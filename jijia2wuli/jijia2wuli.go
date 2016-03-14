@@ -60,7 +60,12 @@ func NewConverter(file string)*Converter{
 		if len(line)==0 {break}
 		var lineid int
 		linestr := line[5]
-		fmt.Sscanf(linestr,"%d",&lineid)
+		var linech string
+		pn,_ := fmt.Sscanf(linestr,"%d%s",&lineid,&linech)
+		if pn != 1{
+			fmt.Println(linestr,"not a line")
+			continue
+		}
 		if line[10] == "1" {
 			if line[11]== "1" {isbigger="+"}else {isbigger="-"}
 			linenamemap[fmt.Sprintf("%d %s",lineid,isbigger)] = line[7]
