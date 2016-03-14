@@ -6,11 +6,12 @@ import(
         "bufio"
 	"sort"
 	"io"
+  "io/ioutil"
 
 
 	"github.com/yibowang/BusVis/readline"
 	"github.com/yibowang/BusVis/jijia2wuli"
-	
+
 )
 
 var converter *jijia2wuli.Converter
@@ -30,8 +31,8 @@ type UD struct {
 }
 
 
-func deal(file string){
-        ifile,err := os.Open(file)
+func deal(file string,srcpath string,base string){
+        ifile,err := os.Open(srcpath+"/"+file)
         if err != nil{
                 panic(err)
         }
@@ -85,14 +86,14 @@ func deal(file string){
 		sortList = append(sortList,b1)
 		sortList = append(sortList,b2)
 	}
-	
-	fb := NewFile(true)
-	fs := NewFile(false)
+
+	fb := NewFile(true,base)
+	fs := NewFile(false,base)
 
 	fb.WriteString("data:[")
 	fs.WriteString("data:[")
 
-	
+
 
 	sort.Sort(ByBusTimeSta(sortList))
 	aline := []BTS{}
@@ -137,10 +138,10 @@ type file struct{
 		...
 	]
 */
-func NewFile(isbigger bool)*file{
+func NewFile(isbigger bool,base string)*file{
 	flag := "+"
 	if !isbigger {flag = "-"}
-	f,err := os.Create(fmt.Sprintf("%d%s",lineid,flag))
+	f,err := os.Create(fmt.Sprintf("%s/%d%s",base,lineid,flag))
 	if err != nil{
 		panic(err)
 	}
@@ -201,7 +202,7 @@ func dealaline(l []BTS,fb *file,fs *file,busid int,ccc int){
 			once = []BTS{}
 		}
 	}
-	
+
 	fb.WriteString("]}")
 	fs.WriteString("]}")
 	//fmt.Println("Bus End")
@@ -231,7 +232,7 @@ func dealonce(o []BTS,f *file,ccc int){
 		}
 		//fmt.Printf("{station:%d,time:%d}",b.station,b.time)
 		f.WriteString(fmt.Sprintf("{station:%d,time:%d}",b.station,b.time))
-		
+
 		//t := b.time
 		//fmt.Printf("      %d %d %d:%02d:%02d\n",b.busid,b.station,t/3600,t/60%60,t%60)
 	}
@@ -283,14 +284,20 @@ func (b ByBusTimeSta)Swap(i,j int){
 
 func main(){
 	if len(os.Args) < 3{
-		fmt.Println("format: pixel stationfile  ic1.csv ic2.csv ...")
+		fmt.Println("format: arrival stationfile  20150803")
 		return
 	}
 	converter = jijia2wuli.NewConverter(os.Args[1])
-        for i,name := range os.Args{
-                if i > 1 {
-                        fmt.Println("deal "+name)
-                        deal(name)
-                }
-        }
+  srcpath := os.Args[2]+"/"+"filtered_linedata"
+
+  files,err := ioutil.ReadDir(srcpath)
+  if err != nil{
+    panic(err)
+  }
+  base := os.Args[2]+"/"+"arrival"
+  os.MkdirAll(base, 0666)
+  for _,file := range files{
+    fmt.Printf("\rdealing "+file.Name())
+    deal(file.Name(),srcpath,base)
+  }
 }

@@ -6,6 +6,7 @@ import(
         "bytes"
         "bufio"
         "sort"
+        "io/ioutil"
 
 	"github.com/yibowang/BusVis/readline"
 )
@@ -87,14 +88,14 @@ func flagSame(linelist [][]string,i int) int{
         return len(linelist)
 }
 
-func orderUp(file string){
-        ifile,err := os.Open(file)
+func orderUp(file string,src string,base string){
+        ifile,err := os.Open(src +"/"+file)
         if err != nil{
                 panic(err)
         }
         defer ifile.Close()
         r := bufio.NewReader(ifile)
-        ofile,err := os.Create(file+"_filter")
+        ofile,err := os.Create(base+"/"+file)
         if err != nil {
                 panic(err)
         }
@@ -122,7 +123,7 @@ func orderUp(file string){
                 if j-i > FILTER {
                         for k:=i;k<j;k++{w.WriteString(vec2str(linelist[k]))}
                 }else{
-                        fmt.Printf("%d-%d is desprated\n",i,j)
+                        //fmt.Printf("%d-%d is desprated\n",i,j)
                 }
                 i = j
         }
@@ -132,13 +133,18 @@ func orderUp(file string){
 
 func main(){
 	if len(os.Args) < 2{
-		fmt.Println("format: fileter file.csv")
-		return 
+		fmt.Println("format: filter origin datapath\nfor example:\nfilter ./20150803")
+		return
 	}
-        for i,name := range os.Args{
-                if i > 0 {
-                        fmt.Println("deal "+name)
-                        orderUp(name)
-                }
-        }
+  srcpath := os.Args[1]+"/"+"linedata"
+  files,err := ioutil.ReadDir(srcpath)
+  if err != nil{
+    panic(err)
+  }
+  base := os.Args[1]+"/"+"filtered_linedata"
+  os.MkdirAll(base, 0666)
+  for _,file := range files{
+    fmt.Printf("\rdealing "+file.Name())
+    orderUp(file.Name(),srcpath,base)
+  }
 }

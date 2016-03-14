@@ -7,7 +7,7 @@ import(
 	"fmt"
 	"sort"
 	"math/rand"
-	
+
 	"github.com/yibowang/BusVis/readline"
 )
 
@@ -32,7 +32,7 @@ type  Converter struct{
 	//"%d %s +",lineid,stationid,		a
 	//"%d %s -",lineid,stationid,		b
 	jijiamap map[string][]Sta
-	//%d +		a-b 
+	//%d +		a-b
 	//%d -		b-a
 	linename map[string]string
 
@@ -52,7 +52,7 @@ func NewConverter(file string)*Converter{
 	mmap := make(map[string][]Sta)
 	sortmapb := make(map[int][]Sta)
 	sortmaps := make(map[int][]Sta)
-	
+
 	linenamemap := make(map[string]string)
 	isbigger := "+"
 	for{
@@ -63,7 +63,7 @@ func NewConverter(file string)*Converter{
 		var linech string
 		pn,_ := fmt.Sscanf(linestr,"%d%s",&lineid,&linech)
 		if pn != 1{
-			fmt.Println(linestr,"not a line")
+			//fmt.Println(linestr,"not a line")
 			continue
 		}
 		if line[10] == "1" {
